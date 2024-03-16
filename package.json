@@ -1,0 +1,15 @@
+{
+  "name": "Dss Project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
