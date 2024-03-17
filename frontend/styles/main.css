@@ -40,3 +40,39 @@ body {
 .movie_poster img {
     width: 200px;
 }
+
+.stars {
+    font-size: xx-large;
+    color: #DB7135;
+}
+
+/* Movie Page Styles */
+.moviepage {
+    display: flex;
+}
+
+.moviepage img {
+    max-height: 400px;
+}
+
+.moviepage div {
+    margin: 0 20px;
+}
+
+
+/* Signin */
+.signin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.signin input {
+    font-size: 18px;
+    padding: 10px;
+    background: #343434;
+    border: 1px solid #595959;
+    color: #dfdfdf;
+    border-radius: 10px;
+  }

@@ -19,5 +19,19 @@ app.get('/', (req, res) => {
     res.sendFile(current_dir + '/frontend/index.html');
 })
 
+// Other Routes (TODO: set up seperate routes file)
+app.get('/movie', (req, res) => {
+    res.sendFile(current_dir + '/frontend/movie.html');
+})
+app.get('/signin', (req, res) => {
+    res.sendFile(current_dir + '/frontend/signin.html');
+})
+app.get('/signup', (req, res) => {
+    res.sendFile(current_dir + '/frontend/signup.html');
+})
+app.get('/reviews', (req, res) => {
+    res.sendFile(current_dir + '/frontend/reviews.html');
+})
+
 // Listen on port
 app.listen(port, () => {console.log(`App started on port ${port}`)});
