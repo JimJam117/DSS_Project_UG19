@@ -11,6 +11,9 @@ const port = 5000;
 // Start server
 const app = express();
 
+// All frontend is publicly available for now
+app.use(express.static(current_dir + '/frontend'));
+
 // Basic route
 app.get('/', (req, res) => {
     res.sendFile(current_dir + '/frontend/index.html');

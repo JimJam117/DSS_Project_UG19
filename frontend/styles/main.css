@@ -1,0 +1,42 @@
+* {
+    
+}
+
+body {
+    background-color: #323232;
+    color: #d9d9d9;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Topbar Styles */
+.topbar {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-around;
+}
+
+.blog_title {
+    color: #DB7135;
+    font-variant: small-caps;
+}
+
+.navbar_link {
+    font-variant: small-caps;
+    font-size: larger;
+    color: #d9d9d9;
+    text-decoration: none;
+    margin: 5px 15px;
+}
+
+/* Section Styles */
+.section {
+    background-color: #454545;
+    margin: 30px;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.movie_poster img {
+    width: 200px;
+}
