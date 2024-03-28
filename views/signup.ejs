@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+
+<div class="section signin">
+    <h2>Sign Up For An Account:</h2>
+
+    <form action="/signup" method="post">
+
+        <label hidden for="email">Email Address</label><br>
+        <input type="email" id="email" name="email" placeholder="Email Address"><br>
+
+        <label hidden for="uname">Desired Username:</label><br>
+        <input type="text" id="uname" name="uname" placeholder="Desired Username"><br>
+
+        <label hidden for="password">Password:</label><br>
+        <input type="password" id="password" name="password" placeholder="Password"><br><br>
+        
+        <input type="submit" value="Create Account">
+    </form>
+</div>
+
+
+<%- include('partials/footer') %>

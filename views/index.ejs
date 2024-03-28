@@ -1,25 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<%- include('partials/header') %>
 
-    <link rel="stylesheet" href="styles/main.css">
 
-    <title>Movie Blog</title>
-</head>
-<body>
-
-    <!-- TopBar -->
-    <div class="topbar">
-        <a class="blog_title" href="/"><h1>Movie Blog</h1></a>
-        
-    <nav>
-        <a class="navbar_link" href="#">Films</a>
-        <a class="navbar_link" href="/signup">Create Account</a>
-        <a class="navbar_link" href="/signin">Sign In</a>
-    </nav>
-</div>
     <!-- Movies Section -->
     <div class="section movies">
         <a  class="movie_poster" href="/movie"><img src="poster_1.webp" alt="poster"></a>
@@ -46,5 +27,5 @@
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi fugiat id minus beatae deleniti nesciunt quaerat, consequatur ullam non quod.</p>
         </div>
     </div>
-</body>
-</html>
+
+<%- include('partials/footer') %>

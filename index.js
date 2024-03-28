@@ -11,26 +11,29 @@ const port = 5000;
 // Start server
 const app = express();
 
-// All frontend is publicly available for now
-app.use(express.static(current_dir + '/frontend'));
+// resources are static
+app.use(express.static(current_dir + '/resources'));
+
+// ejs as view engine
+app.set('view engine', 'ejs')
 
 // Basic route
 app.get('/', (req, res) => {
-    res.sendFile(current_dir + '/frontend/index.html');
+    res.render('index')
 })
 
 // Other Routes (TODO: set up seperate routes file)
 app.get('/movie', (req, res) => {
-    res.sendFile(current_dir + '/frontend/movie.html');
+    res.render('movie')
 })
 app.get('/signin', (req, res) => {
-    res.sendFile(current_dir + '/frontend/signin.html');
+    res.render('signin')
 })
 app.get('/signup', (req, res) => {
-    res.sendFile(current_dir + '/frontend/signup.html');
+    res.render('signup')
 })
 app.get('/reviews', (req, res) => {
-    res.sendFile(current_dir + '/frontend/reviews.html');
+    res.render('reviews')
 })
 
 // Listen on port

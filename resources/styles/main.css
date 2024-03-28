@@ -16,9 +16,25 @@ body {
     justify-content: space-around;
 }
 
+.topbar-right {
+    display: flex;
+    align-items: baseline;
+}
+
+.search {
+    font-size: 18px;
+    padding: 7px;
+    margin-left: 10px;
+    background: #595959;
+    border: 1px solid #343434;
+    color: #f6f6f6;
+    border-radius: 10px;
+  }
+
 .blog_title {
     color: #DB7135;
     font-variant: small-caps;
+    text-decoration: none;
 }
 
 .navbar_link {
