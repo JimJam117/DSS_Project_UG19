@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS movies;
 let usersCreateTable = `
 CREATE TABLE IF NOT EXISTS users 
 ( 
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    id integer NOT NULL,
     email character varying COLLATE pg_catalog."default" NOT NULL,
     username character varying COLLATE pg_catalog."default" NOT NULL,
     password character varying COLLATE pg_catalog."default",
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS movies
     title character varying COLLATE pg_catalog."default" NOT NULL,
     release_date date,
     director character varying COLLATE pg_catalog."default",
-    "cast" character varying COLLATE pg_catalog."default",
+    movie_cast character varying COLLATE pg_catalog."default",
     image_url character varying COLLATE pg_catalog."default",
     CONSTRAINT movies_pkey PRIMARY KEY (id),
     CONSTRAINT movies_pkey_unique UNIQUE (id)
@@ -112,20 +112,58 @@ CREATE TABLE IF NOT EXISTS reviews
 )
 `
 
-// add admin user
-let addAdminUser = `
-INSERT INTO users (email,username,password,is_admin) 
-    SELECT 'admin@movies.com','admin','password','true' WHERE NOT EXISTS (SELECT * FROM users WHERE username='admin')
+// add admin user and default users
+let addDefaultUsers = `
+INSERT INTO users (id,email,username,password,is_admin) 
+    SELECT '1','admin@movies.com','admin','password','true' WHERE NOT EXISTS (SELECT * FROM users WHERE username='admin');
+
+INSERT INTO users (id,email,username,password,is_admin) 
+    SELECT '2','tom@movies.com','Tom F.','password','false' WHERE NOT EXISTS (SELECT * FROM users WHERE username='Tom F.');
+
+INSERT INTO users (id,email,username,password,is_admin) 
+    SELECT '3','john@movies.com','John H.','password','false' WHERE NOT EXISTS (SELECT * FROM users WHERE username='John H.');
 `
 
+// add movie records to DB
+let addDefaultMovies = `
+INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
+    SELECT '1','Dune','01/01/24','John Smith','cast','poster_1.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Dune');
+
+INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
+    SELECT '2','The Taste of Things','01/01/24','John Smith','cast','poster_2.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='The Taste of Things');
+
+INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
+    SELECT '3','Perfect Days','01/01/24','John Smith','cast','poster_3.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Perfect Days');
+
+INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
+    SELECT '4','Shayda','01/01/24','John Smith','cast','poster_4.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Shayda');
+`
+
+// Add default reviews
+let addDefaultReviews = `
+INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
+    SELECT '1','3','Okay','Lorem Ipsum','2','3' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='1');
+
+INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
+    SELECT '2','1','1 Star Bad','Lorem Ipsum','2','2' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='2');
+
+INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
+    SELECT '3','5','5 Stars good','Lorem Ipsum','3','1' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='3');
 
 
-
+`
 
 await client.query(dropTables)
+
 await client.query(usersCreateTable)
-await client.query(addAdminUser)
+await client.query(addDefaultUsers)
+
 await client.query(moviesCreateTable)
+await client.query(addDefaultMovies)
+
 await client.query(reviewsCreateTable)
+await client.query(addDefaultReviews)
+
+
  
 await client.end()
