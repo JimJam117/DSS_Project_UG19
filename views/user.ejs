@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+
+  <!-- User Section -->
+  <div class="section user">
+    <div>
+        <h1><%= user_username %></h1>
+
+        <h2>Reviews:</h2>
+
+        <ul>
+            <% user_reviews.forEach(function(review){ %>
+                <li><a href="/review/<%= review.id %>"><%= review.movie_title %>: <%= review.title %></a></li>
+              <% }); %>
+        </ul>
+      
+    </div>
+</div>
+
+<%- include('partials/footer') %>

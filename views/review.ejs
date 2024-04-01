@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+
+  <!-- Review Section -->
+  <div class="section moviepage">
+    <div>
+        <h1><%= review_title %></h1>
+
+        <p>Review for: <a href="/movie/<%= movie_id %>"><%= movie_title %></a> by user: <a href="/user/<%= review_userid %>"><%= review_username %></a></p>
+        
+        <%= review_body %>
+      
+        <hr>       
+        <p><strong>Rating: </strong> <span class="stars"> &#9733; &#9733; &#9733; &#9733; &#9734;</span></p>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

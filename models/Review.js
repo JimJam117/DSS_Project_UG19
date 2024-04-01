@@ -16,6 +16,37 @@ export const GetAllReviews = async () => {
     } 
 }
 
+export const GetAllReviewsForUserId = async (id) => {
+    try { 
+        // get all reviews for user
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const reviews = await client.query(`SELECT * FROM reviews WHERE user_id='${id}'`)
+        return(reviews.rows)
+    }
+    catch(err) {
+        console.log("error getting reviews for user id:")
+        console.log(err)
+        return err;
+    } 
+}
+
+export const GetAllReviewsForMovieId = async (id) => {
+    try { 
+        // get all reviews for user
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const reviews = await client.query(`SELECT * FROM reviews WHERE movie_id='${id}'`)
+        return(reviews.rows)
+    }
+    catch(err) {
+        console.log("error getting reviews for movie id:")
+        console.log(err)
+        return err;
+    } 
+}
+
+
 export const GetReview = async (id) => {
     try { 
         // get review

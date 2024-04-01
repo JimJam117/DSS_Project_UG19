@@ -136,13 +136,31 @@ INSERT INTO movies (id,title,release_date,director,movie_cast,image_url)
 // Add default reviews
 let addDefaultReviews = `
 INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '1','3','Okay','Lorem Ipsum','2','3' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='1');
+    SELECT '1','3','Okay','
+Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+fugiat aspernatur!',
+'2','3' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='1');
 
 INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '2','1','1 Star Bad','Lorem Ipsum','2','2' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='2');
+    SELECT '2','1','1 Star Bad','
+    Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+    Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+    pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+    voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+    fugiat aspernatur!',
+    '2','2' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='2');
 
 INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '3','5','5 Stars good','Lorem Ipsum','3','1' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='3');
+    SELECT '3','5','5 Stars good','
+    Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+fugiat aspernatur!',
+    '3','1' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='3');
 
 
 `
