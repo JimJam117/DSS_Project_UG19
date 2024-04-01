@@ -2,7 +2,7 @@ import express, { query } from 'express';
 import {dirname} from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg'
-
+import { dbConfig } from './config/db_config.js';
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -10,13 +10,7 @@ const current_dir = dirname(fileURLToPath(import.meta.url));
 // Env variables
 const port = 5000;
 
-const client = new pg.Client({
-    host: 'localhost',
-    user: 'postgres',
-    password: 'password',
-    port: 5432,
-   database: 'DSS'
-})
+const client = new pg.Client(dbConfig)
 
 // Start server
 const app = express();
@@ -33,9 +27,9 @@ app.get('/', (req, res) => {
 })
 
 // Other Routes (TODO: set up seperate routes file)
-app.get('/movie', (req, res) => {
-    res.render('movie')
-})
+// app.get('/movie', (req, res) => {
+//     res.render('movie')
+// })
 app.get('/signin', (req, res) => {
     res.render('signin')
 })
@@ -167,3 +161,13 @@ await client.query(addDefaultReviews)
 
  
 await client.end()
+
+
+
+import userRoutes from './routes/user.js'
+import movieRoutes from './routes/movie.js'
+import reviewRoutes from './routes/review.js'
+
+app.use('/user', userRoutes);
+app.use('/movie', movieRoutes);
+app.use('/review', reviewRoutes);
