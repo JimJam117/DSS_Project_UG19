@@ -8,7 +8,9 @@ export const getAllUsers = async (req, res) => {
     try { 
         // get all users
         const users = await GetAllUsers();
-            return res.status(200).json(users);
+        return res.render('users', {
+            users: users
+        })
     }
     catch(err) {
         return res.status(500).json(err);

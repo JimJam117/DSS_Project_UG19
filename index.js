@@ -3,6 +3,8 @@ import {dirname} from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg'
 import { dbConfig } from './config/db_config.js';
+import {GetAllMovies} from './models/Movie.js'
+import {GetAllReviews} from './models/Review.js'
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -22,22 +24,22 @@ app.use(express.static(current_dir + '/resources'));
 app.set('view engine', 'ejs')
 
 // Basic route
-app.get('/', (req, res) => {
-    res.render('index')
+app.get('/', async (req, res) => {
+    const movies = await GetAllMovies();
+    const reviews = await GetAllReviews();
+    return res.render('index', {
+        movies: movies,
+        reviews: reviews
+    })
+    
 })
 
-// Other Routes (TODO: set up seperate routes file)
-// app.get('/movie', (req, res) => {
-//     res.render('movie')
-// })
+
 app.get('/signin', (req, res) => {
     res.render('signin')
 })
 app.get('/signup', (req, res) => {
     res.render('signup')
-})
-app.get('/reviews', (req, res) => {
-    res.render('reviews')
 })
 
 

@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+
+    <!-- users Section -->
+    <div class="section">
+        <h1>Users:</h1>
+ 
+        <% users.forEach(function(user){ %>
+            <a href="/user/<%= user.id %>" class="list_item">
+                <div class="list_item_image">
+                    <img src="/profile.jpg" alt="profile pic">
+                </div>
+                <div class="list_item_details">
+                    <h2><%= user.username %></h2>
+                </div>
+                
+            </a>
+            <% }); %>
+ 
+    </div>
+
+   
+
+<%- include('partials/footer') %>

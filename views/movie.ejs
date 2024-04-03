@@ -1,7 +1,8 @@
 <%- include('partials/header') %>
 
   <!-- Movie Section -->
-  <div class="section moviepage">
+  <div class="section">
+    <div class="moviepage">
     <img src="/<%= image_url %>" alt="poster">
     <div>
         <h2>Movie Title: <%= title %></h2>
@@ -10,8 +11,23 @@
         <p><strong>Cast:</strong> <%= movie_cast %></p>
 
         <hr>       
-        <p><strong>Rating: </strong> <span class="stars"> &#9733; &#9733; &#9733; &#9733; &#9734;</span></p>
+        <p><strong>Rating: </strong> <span class="stars"> <%= rating %></span></p>
     </div>
+  </div>
+    <hr>
+    <div>
+      <h2>Reviews</h2>
+      <ul>
+        <% reviews.forEach(function(review){ %>
+          <li>
+            <a href="/review/<%= review.id %>">
+              <strong><%= review.title %></strong>, by <%= review.review_username %>
+            </a>
+          </li>
+          <% }); %>
+      </ul>
+    </div>
+    <br>
 </div>
 
 <%- include('partials/footer') %>

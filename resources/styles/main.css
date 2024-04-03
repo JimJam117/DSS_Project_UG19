@@ -79,6 +79,25 @@ body {
     margin: 0 20px;
 }
 
+/* lists */
+.list_item {
+  margin: 30px;
+  padding: 30px;
+  border-radius: 40px;
+  display: flex;
+  text-decoration: none;
+  color: #d9d9d9;
+}
+.list_item_details {
+    margin: 0 30px;
+}
+.list_item_image img {
+    width: 300px;
+}
+.review {
+    text-decoration: none;
+    color: #d9d9d9;
+}
 
 /* Signin */
 .signin {

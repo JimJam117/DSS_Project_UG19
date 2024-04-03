@@ -3,29 +3,21 @@
 
     <!-- Movies Section -->
     <div class="section movies">
-        <a  class="movie_poster" href="/movie"><img src="poster_1.png" alt="poster"></a>
-        <a  class="movie_poster" href="/movie"><img src="poster_1.png" alt="poster"></a>
-        <a  class="movie_poster" href="/movie"><img src="poster_1.png" alt="poster"></a>
-        <a  class="movie_poster" href="/movie"><img src="poster_1.png" alt="poster"></a>
+        <% movies.forEach(function(movie){ %>
+            <a  class="movie_poster" href="/movie/<%= movie.id %>"><img src="/<%= movie.image_url %>" alt="poster"></a>
+        <% }); %>
+
     </div>
 
     <!-- Recent Reviews Section -->
     <div class="section reviews">
         <h2>Recent Reviews</h2>
-        <div class="review">
-            <h3>Tom F.</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi fugiat id minus beatae deleniti nesciunt quaerat, consequatur ullam non quod.</p>
-        </div>
-
-        <div class="review">
-            <h3>Tom F.</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi fugiat id minus beatae deleniti nesciunt quaerat, consequatur ullam non quod.</p>
-        </div>
-
-        <div class="review">
-            <h3>Tom F.</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi fugiat id minus beatae deleniti nesciunt quaerat, consequatur ullam non quod.</p>
-        </div>
+        <% reviews.forEach(function(review){ %>
+            <a href="/review/<%= review.id %>" class="review">
+                <h3><%= review.title %></h3>
+                <p><%= review.body %></p>
+            </a>
+            <% }); %>
     </div>
 
 <%- include('partials/footer') %>
