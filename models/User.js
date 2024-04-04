@@ -31,3 +31,19 @@ export const GetUser = async (id) => {
         return err;
     } 
 }
+
+
+export const GetAllUsersForQuery = async (query) => {
+    try { 
+        // get all users for query
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const users = await client.query(`SELECT * FROM users WHERE LOWER(username) LIKE '%${query}%'`)
+        return(users.rows)
+    }
+    catch(err) {
+        console.log("error getting users for query:")
+        console.log(err)
+        return err;
+    } 
+}

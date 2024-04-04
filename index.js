@@ -5,6 +5,7 @@ import pg from 'pg'
 import { dbConfig } from './config/db_config.js';
 import {GetAllMovies} from './models/Movie.js'
 import {GetAllReviews} from './models/Review.js'
+import bodyParser from 'body-parser'
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -19,6 +20,10 @@ const app = express();
 
 // resources are static
 app.use(express.static(current_dir + '/resources'));
+app.use(express.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+  }));
 
 // ejs as view engine
 app.set('view engine', 'ejs')
@@ -183,11 +188,12 @@ await client.query(addDefaultReviews)
 await client.end()
 
 
-
+import genericRoutes from './routes/generic.js'
 import userRoutes from './routes/user.js'
 import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
+app.use('/', genericRoutes);
 app.use('/user', userRoutes);
 app.use('/movie', movieRoutes);
 app.use('/review', reviewRoutes);
