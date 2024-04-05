@@ -17,14 +17,24 @@
         <div class="topbar-right">
 
             <nav>
-                <a class="navbar_link" href="/movie">Films</a>
-                <a class="navbar_link" href="/signup">Create Account</a>
-                <a class="navbar_link" href="/signin">Sign In</a>
+                
+                <% if (session_username) {  %>
+                    <form action="/auth/logout" method="post" content-type="application/json">
+                        <a class="navbar_link" href="/movie">Films</a>
+                        <button class="navbar_link" type="submit">Logout</button>
+                        <span class="navbar_link logged_in_msg">Logged in as: <%= session_username %></span>
+                    </form>
+                    
+                <% } else { %>
+                    <a class="navbar_link" href="/movie">Films</a>
+                    <a class="navbar_link" href="/auth/signup">Create Account</a>
+                    <a class="navbar_link" href="/auth/signin">Sign In</a>
+                <% } %>
             </nav>
             
             <form action="/search" method="post" content-type="application/json">
                 <input type="text" name="query" class="search" id="query" placeholder="Search... 🔎"  />
-                <button type="submit">Submit</button>
+                <button type="submit" hidden>Submit</button>
             </form>
             
         </div>

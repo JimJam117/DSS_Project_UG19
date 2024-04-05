@@ -1,7 +1,7 @@
 import {GetAllMovies, GetMovie} from '../models/Movie.js'
-import { GetUser } from '../models/User.js';
 import { GetAllReviewsForMovieId } from '../models/Review.js';
-import { calcStars } from '../rating.js';
+import { GetUser } from '../models/User.js';
+import { calcStars } from '../scripts/rating.js';
 
 
 // get all movies details
@@ -10,11 +10,15 @@ export const getAllMovies = async (req, res) => {
         // get all movies
         const movies = await GetAllMovies();
         return res.render('movies', {
+            session_username: req.session.user ? req.session.user.username : false,
             movies: movies
         })
     }
     catch(err) {
-        return res.status('500').render('oops')
+        return res.status('500').render('oops', {
+            session_username: req.session.user ? req.session.user.username : false,
+            error_code: 500, msg: "Generic Error"
+        })
     } 
 }
 
@@ -54,6 +58,7 @@ export const getMovie = async (req, res) => {
 
         // return a render of the view with the detials as params
         return res.render('movie', {
+            session_username: req.session.user ? req.session.user.username : false,
             title: movie.title,
             director: movie.director,
             movie_cast: movie.movie_cast,
@@ -64,6 +69,9 @@ export const getMovie = async (req, res) => {
         })
     }
     catch(err) {
-        return res.status('500').render('oops')
+        return res.status('500').render('oops', {
+            session_username: req.session.user ? req.session.user.username : false,
+            error_code: 500, msg: "Generic Error"
+        })
     } 
 }

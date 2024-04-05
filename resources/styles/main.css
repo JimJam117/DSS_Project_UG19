@@ -47,6 +47,13 @@ body {
     color: #d9d9d9;
     text-decoration: none;
     margin: 5px 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.logged_in_msg {
+    color: #aaaaaa;
 }
 
 /* Section Styles */
@@ -115,3 +122,7 @@ body {
     color: #dfdfdf;
     border-radius: 10px;
   }
+
+.error {
+    color: rgb(216, 66, 66);
+}

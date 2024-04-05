@@ -9,6 +9,7 @@ export const getAllUsers = async (req, res) => {
         // get all users
         const users = await GetAllUsers();
         return res.render('users', {
+            session_username: req.session.user ? req.session.user.username : false,
             users: users
         })
     }
@@ -35,12 +36,13 @@ export const getUser = async (req, res) => {
         }
         
         return res.render('user', {
+                session_username: req.session.user ? req.session.user.username : false,
                 user_reviews: reviewsWithMovieTitles,
                 user_username: user.username,
             })
     }
     catch(err) {
         console.log(err)
-        return res.status('500').render('oops')
+        return res.status('500').render('')
     } 
 }

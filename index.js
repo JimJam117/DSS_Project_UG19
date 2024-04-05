@@ -5,18 +5,34 @@ import pg from 'pg'
 import { dbConfig } from './config/db_config.js';
 import {GetAllMovies} from './models/Movie.js'
 import {GetAllReviews} from './models/Review.js'
+import session from 'express-session'
 import bodyParser from 'body-parser'
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
 
 // Env variables
-const port = 5000;
+const PORT = 5000;
+const SECRET = "secret code"
+const COOKIE = {
+    maxAge: 1000000, 
+    httpOnly: true,
+    secure: false // This should be set to true in production, not for localhost
+}
 
-const client = new pg.Client(dbConfig)
+// global store for sessions
+export const GLOBAL_STORE = new session.MemoryStore() 
 
 // Start server
-const app = express();
+const app = express(); 
+
+app.use(session({
+    secret: SECRET,
+    store: GLOBAL_STORE,
+    cookie: COOKIE, // approx 15 mins age for cookie, should be longer in prod
+    saveUninitialized: false,
+    resave: true
+}))
 
 // resources are static
 app.use(express.static(current_dir + '/resources'));
@@ -28,33 +44,12 @@ app.use(bodyParser.urlencoded({
 // ejs as view engine
 app.set('view engine', 'ejs')
 
-// Basic route
-app.get('/', async (req, res) => {
-    const movies = await GetAllMovies();
-    const reviews = await GetAllReviews();
-    return res.render('index', {
-        movies: movies,
-        reviews: reviews
-    })
-    
-})
+// Listen on PORT
+app.listen(PORT, () => {console.log(`App started on port ${PORT}`)});
 
 
-app.get('/signin', (req, res) => {
-    res.render('signin')
-})
-app.get('/signup', (req, res) => {
-    res.render('signup')
-})
-
-
-
-
-// Listen on port
-app.listen(port, () => {console.log(`App started on port ${port}`)});
-
-
-
+// Database initialisation
+const client = new pg.Client(dbConfig); // client used for postgres
 await client.connect()
  
 let dropTables = `
@@ -189,11 +184,14 @@ await client.end()
 
 
 import genericRoutes from './routes/generic.js'
+import authRoutes from './routes/auth.js'
 import userRoutes from './routes/user.js'
 import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
+
 app.use('/', genericRoutes);
+app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/movie', movieRoutes);
 app.use('/review', reviewRoutes);

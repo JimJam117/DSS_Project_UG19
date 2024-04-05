@@ -4,7 +4,17 @@
     <!-- Oops Section -->
     <div class="section">
         <h1>Oops!</h1>
-        <p>An error occurred.</p>
+        <hr>
+        <% if(error_code) { %>
+            <h3><%= error_code %></h3>
+        <% } %>
+        
+        <% if(msg) { %>
+            <p><%= msg %></p>
+        <% } else { %>
+            <p>An error occurred.</p>
+        <% } %>
+        
         <p>
             <a href="/">Return to home page</a>
         </p>

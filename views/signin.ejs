@@ -3,7 +3,7 @@
 <div class="section signin">
     <h2>Sign in</h2>
 
-    <form action="/signin" method="post">
+    <form action="/auth/login" method="post" content-type="json">
 
         <label hidden for="uname">username:</label><br>
         <input type="text" id="uname" name="uname" placeholder="Username"><br>
@@ -11,8 +11,13 @@
         <label hidden for="password">password:</label><br>
         <input type="password" id="password" name="password" placeholder="Password"><br><br>
 
+        <% if(error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
         <input type="submit" value="Sign In">
     </form>
+
+
 </div>
 
 
