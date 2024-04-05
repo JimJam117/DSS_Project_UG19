@@ -1,7 +1,6 @@
 import {GetAllReviews, GetAllReviewsForQuery} from '../models/Review.js'
 import {GetAllMovies, GetAllMoviesForQuery} from '../models/Movie.js'
 import {GetAllUsersForQuery} from '../models/User.js'
-import checkSessionIsValid from '../scripts/checkSessionIsValid.js';
 
 // get homepage 
 export const getIndex = async (req, res) => {

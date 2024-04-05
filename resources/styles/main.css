@@ -114,6 +114,10 @@ body {
     align-items: center;
 }
 
+.signin form {
+    text-align: center;
+}
+
 .signin input {
     font-size: 18px;
     padding: 10px;

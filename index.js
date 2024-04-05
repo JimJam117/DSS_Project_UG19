@@ -61,7 +61,7 @@ DROP TABLE IF EXISTS movies;
 let usersCreateTable = `
 CREATE TABLE IF NOT EXISTS users 
 ( 
-    id integer NOT NULL,
+    id serial NOT NULL,
     email character varying COLLATE pg_catalog."default" NOT NULL,
     username character varying COLLATE pg_catalog."default" NOT NULL,
     password character varying COLLATE pg_catalog."default",
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS users
 let moviesCreateTable = `
 CREATE TABLE IF NOT EXISTS movies
 (
-    id integer NOT NULL,
+    id serial NOT NULL,
     title character varying COLLATE pg_catalog."default" NOT NULL,
     release_date date,
     director character varying COLLATE pg_catalog."default",
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS movies
 let reviewsCreateTable = `
 CREATE TABLE IF NOT EXISTS reviews
 (
-    id integer NOT NULL,
+    id serial NOT NULL,
     rating integer NOT NULL,
     title character varying COLLATE pg_catalog."default",
     body character varying COLLATE pg_catalog."default",
@@ -110,59 +110,56 @@ CREATE TABLE IF NOT EXISTS reviews
 
 // add admin user and default users
 let addDefaultUsers = `
-INSERT INTO users (id,email,username,password,is_admin) 
-    SELECT '1','admin@movies.com','admin','password','true' WHERE NOT EXISTS (SELECT * FROM users WHERE username='admin');
+INSERT INTO users (email,username,password,is_admin) 
+    VALUES ('admin@movies.com','admin','password','true');
 
-INSERT INTO users (id,email,username,password,is_admin) 
-    SELECT '2','tom@movies.com','Tom F.','password','false' WHERE NOT EXISTS (SELECT * FROM users WHERE username='Tom F.');
+INSERT INTO users (email,username,password,is_admin) 
+    VALUES ('tom@movies.com','Tom F.','password','false');
 
-INSERT INTO users (id,email,username,password,is_admin) 
-    SELECT '3','john@movies.com','John H.','password','false' WHERE NOT EXISTS (SELECT * FROM users WHERE username='John H.');
+INSERT INTO users (email,username,password,is_admin) 
+    VALUES ('john@movies.com','John H.','password','false');
 `
 
 // add movie records to DB
 let addDefaultMovies = `
-INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
-    SELECT '1','Dune','01/01/24','John Smith','cast','poster_1.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Dune');
+INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
+    values ('Dune','01/01/24','John Smith','cast','poster_1.png');
 
-INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
-    SELECT '2','The Taste of Things','01/01/24','John Smith','cast','poster_2.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='The Taste of Things');
+INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
+    VALUES ('The Taste of Things','01/01/24','John Smith','cast','poster_2.png');
 
-INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
-    SELECT '3','Perfect Days','01/01/24','John Smith','cast','poster_3.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Perfect Days');
+INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
+    VALUES ('Perfect Days','01/01/24','John Smith','cast','poster_3.png');
 
-INSERT INTO movies (id,title,release_date,director,movie_cast,image_url) 
-    SELECT '4','Shayda','01/01/24','John Smith','cast','poster_4.png' WHERE NOT EXISTS (SELECT * FROM movies WHERE title='Shayda');
+INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
+    VALUES ('Shayda','01/01/24','John Smith','cast','poster_4.png');
 `
 
 // Add default reviews
 let addDefaultReviews = `
-INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '1','3','Okay','
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
-Tenetur dolore at velit cum consequatur dolores quam, alias odit 
-pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
-voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
-fugiat aspernatur!',
-'2','3' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='1');
+INSERT INTO reviews (rating,title,body,user_id,movie_id) 
+    VALUES ('3','Okay','
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+            Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+            pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+            voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+            fugiat aspernatur!','2','3');
 
-INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '2','1','1 Star Bad','
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
-    Tenetur dolore at velit cum consequatur dolores quam, alias odit 
-    pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
-    voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
-    fugiat aspernatur!',
-    '2','2' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='2');
+INSERT INTO reviews (rating,title,body,user_id,movie_id) 
+    VALUES ('1','1 Star Bad','
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+            Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+            pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+            voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+            fugiat aspernatur!','2','2');
 
-INSERT INTO reviews (id,rating,title,body,user_id,movie_id) 
-    SELECT '3','5','5 Stars good','
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
-Tenetur dolore at velit cum consequatur dolores quam, alias odit 
-pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
-voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
-fugiat aspernatur!',
-    '3','1' WHERE NOT EXISTS (SELECT * FROM reviews WHERE id='3');
+INSERT INTO reviews (rating,title,body,user_id,movie_id) 
+    VALUES ('5','5 Stars good','
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
+        Tenetur dolore at velit cum consequatur dolores quam, alias odit 
+        pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
+        voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
+        fugiat aspernatur!','3','1');
 
 
 `
