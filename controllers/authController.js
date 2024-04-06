@@ -42,7 +42,7 @@ export const login = async (req, res) => {
                 
                 // set the session to authenticated
                 req.session.authenticated = true;
-                req.session.user = {username}
+                req.session.user = {id: user.id, username: username}
 
                 // redirect to homepage, now logged in
                 return res.redirect('/')

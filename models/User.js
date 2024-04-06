@@ -12,7 +12,7 @@ export const GetAllUsers = async () => {
     catch(err) {
         console.log("error getting users:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -28,7 +28,7 @@ export const GetUser = async (id) => {
     catch(err) {
         console.log("error getting user:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -44,7 +44,7 @@ export const GetAllUsersForQuery = async (query) => {
     catch(err) {
         console.log("error getting users for query:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -61,7 +61,7 @@ export const GetUserByUsername = async (username) => {
     catch(err) {
         console.log("error getting user:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -78,7 +78,7 @@ export const GetUserByEmail = async (email) => {
     catch(err) {
         console.log("error getting user:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -99,6 +99,6 @@ export const CreateUser = async (username, email, password) => {
     catch(err) {
         console.log("error creating user:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }

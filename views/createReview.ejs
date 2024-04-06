@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<div class="section review">
+    <h2>Create New Review:</h2>
+
+    <form action="/review/create" method="post" content-type="json">
+
+        <label for="movie_id">Review for Movie:</label><br>
+        <select id="movie_id" name="movie_id">
+        <% movies.forEach(function(movie){%>
+            <option value="<%=movie.id %>"><%=movie.title %></option>
+        <%});%>
+        </select>
+
+        <br><br><label for="rating">Rating:</label><br>
+        <select id="rating" name="rating">
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+
+        <br><br><label for="title">Review Title:</label><br>
+        <input type="text" id="title" name="title" placeholder="Title..."><br>
+
+        <br><label for="body">Review Body:</label><br>
+        <textarea type="text" id="body" name="body" placeholder="Review Body...." rows="4" cols="50"></textarea><br>
+        <br>
+        <hr>
+        <% if(error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+        <br>
+        <input type="submit" value="Create Review">
+    </form>
+</div>
+
+
+<%- include('partials/footer') %>

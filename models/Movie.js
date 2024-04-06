@@ -12,7 +12,7 @@ export const GetAllMovies = async () => {
     catch(err) {
         console.log("error getting movies:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -28,7 +28,7 @@ export const GetMovie = async (id) => {
     catch(err) {
         console.log("error getting movie:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -44,6 +44,6 @@ export const GetAllMoviesForQuery = async (query) => {
     catch(err) {
         console.log("error getting movies for query:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }

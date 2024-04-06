@@ -118,7 +118,7 @@ body {
     text-align: center;
 }
 
-.signin input {
+.signin input, .review input, .review textarea, .review select {
     font-size: 18px;
     padding: 10px;
     background: #343434;

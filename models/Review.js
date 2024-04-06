@@ -12,7 +12,7 @@ export const GetAllReviews = async () => {
     catch(err) {
         console.log("error getting reviews:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -27,7 +27,7 @@ export const GetAllReviewsForUserId = async (id) => {
     catch(err) {
         console.log("error getting reviews for user id:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -42,7 +42,23 @@ export const GetAllReviewsForMovieId = async (id) => {
     catch(err) {
         console.log("error getting reviews for movie id:")
         console.log(err)
-        return err;
+        return undefined;
+    } 
+}
+
+
+export const GetReviewForMovieByUserId = async (movie_id, user_id) => {
+    try { 
+        // get all reviews for movie
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const review = await client.query(`SELECT * FROM reviews WHERE movie_id='${movie_id}' AND user_id='${user_id}'`)
+        return(review.rows[0])
+    }
+    catch(err) {
+        console.log("error getting review for movie and user id:")
+        console.log(err)
+        return undefined;
     } 
 }
 
@@ -57,7 +73,7 @@ export const GetAllReviewsForQuery = async (query) => {
     catch(err) {
         console.log("error getting reviews for query:")
         console.log(err)
-        return err;
+        return undefined;
     } 
 }
 
@@ -74,6 +90,26 @@ export const GetReview = async (id) => {
     catch(err) {
         console.log("error getting review:")
         console.log(err)
-        return err;
+        return undefined;
+    } 
+}
+
+export const CreateReview = async (rating, title, body, user_id, movie_id) => {
+    try { 
+
+        // sql query:
+        const query = `INSERT INTO reviews (rating,title,body,user_id,movie_id) VALUES 
+        ('${rating}','${title}','${body}','${user_id}','${movie_id}');`
+
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const createReview = await client.query(query)
+        console.log("Creating review " + title + " by user " + user_id + ".")
+        return(createReview)
+    }
+    catch(err) {
+        console.log("error creating review:")
+        console.log(err)
+        return undefined;
     } 
 }
