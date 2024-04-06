@@ -130,3 +130,10 @@ body {
 .error {
     color: rgb(216, 66, 66);
 }
+
+.delete_button {
+    color: #dfdfdf;
+    background-color: rgb(180, 45, 45);
+    border: 1px solid rgb(140, 45, 45);
+    padding: 3px;
+}

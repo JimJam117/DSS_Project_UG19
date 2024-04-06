@@ -5,6 +5,14 @@
     <div>
         <h1><%= review_title %></h1>
 
+        <% if (reviewBelongsToSessionUser) {  %>
+          <form action="/review/delete" method="post" content-type="application/json">
+              <input hidden name="id" id="id" value="<%= review_id %>">
+              <button class="navbar_link delete_button" type="submit">Delete This Review</button>
+          </form>
+          
+      <% } %>
+
         <p>Review for: <a href="/movie/<%= movie_id %>"><%= movie_title %></a> by user: <a href="/user/<%= review_userid %>"><%= review_username %></a></p>
         
         <%= review_body %>

@@ -113,3 +113,21 @@ export const CreateReview = async (rating, title, body, user_id, movie_id) => {
         return undefined;
     } 
 }
+
+export const DeleteReview = async (id) => {
+    try { 
+        // sql query:
+        const query = `DELETE FROM reviews WHERE id='${id}';`
+
+        const client = new pg.Client(dbConfig)
+        await client.connect()
+        const delReview = await client.query(query)
+        console.log("deleting review " + id + ".")
+        return(delReview)
+    }
+    catch(err) {
+        console.log(`error deleting review (${id}):`)
+        console.log(err)
+        return undefined;
+    } 
+}
