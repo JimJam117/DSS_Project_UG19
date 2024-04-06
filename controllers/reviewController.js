@@ -3,12 +3,14 @@ import {GetAllMovies, GetMovie} from '../models/Movie.js'
 import {GetUser} from '../models/User.js'
 import { calcStars } from '../scripts/rating.js';
 import sanitiseSQL from '../scripts/sanitiseSQL.js';
+import { enum_timeout } from '../index.js';
 
 // get all reviews details
 export const getAllReviews = async (req, res) => {
     try { 
         // get all reviews
         const reviews = await GetAllReviews();
+
         return res.render('reviews', {
             session_username: req.session.user ? req.session.user.username : false,
             reviews: reviews,
@@ -127,6 +129,7 @@ export const createReview = async (req, res) => {
 
             // check user id is valid
             if (user === undefined) {
+                await enum_timeout(req.startTime); // account enumeration timeout
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
@@ -136,6 +139,7 @@ export const createReview = async (req, res) => {
 
         // if the user is not authenticated
         else {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: No valid session.`
@@ -148,6 +152,7 @@ export const createReview = async (req, res) => {
         const movie = await GetMovie(movie_id)
 
         if (movie === undefined) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(400).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
                 movies,
@@ -159,6 +164,7 @@ export const createReview = async (req, res) => {
         const preexistingReview = await GetReviewForMovieByUserId(movie_id, user.id)
 
         if (preexistingReview !== undefined) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
                 movies,
@@ -168,6 +174,7 @@ export const createReview = async (req, res) => {
 
         // check that the title and body meet the minimum length
         if (title.length < 1) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
                 movies,
@@ -176,6 +183,7 @@ export const createReview = async (req, res) => {
         }
 
         if (body === undefined || body.length < 1) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
                 movies,
@@ -190,12 +198,14 @@ export const createReview = async (req, res) => {
         const newReview = await GetReviewForMovieByUserId(movie_id, user.id)
         
         // display the new review
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.redirect('/review/' + newReview.id)
     
 
     }
     catch(err) {
         console.log("Error creating review:", err)
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: `Error occured when creating review.`
@@ -216,6 +226,7 @@ export const deleteReview = async (req, res) => {
 
             // check user id is valid
             if (user === undefined) {
+                await enum_timeout(req.startTime); // account enumeration timeout
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
@@ -225,6 +236,7 @@ export const deleteReview = async (req, res) => {
 
         // if the user is not authenticated
         else {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: No valid session.`
@@ -235,6 +247,7 @@ export const deleteReview = async (req, res) => {
         const review = await GetReview(reviewId)
 
         if (review === undefined) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 400, msg: `Bad Request: Specified review id does not exist.`
@@ -245,6 +258,7 @@ export const deleteReview = async (req, res) => {
         const user = await GetUser(req.session.user.id)
 
         if (review.user_id != user.id) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: You cannot delete reviews from other users.`
@@ -255,11 +269,13 @@ export const deleteReview = async (req, res) => {
         await DeleteReview(reviewId)
               
         // display the users page
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.redirect('/user/' + user.id)
     
     }
     catch(err) {
         console.log("Error deleting review:", err)
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: `Error occured when deleting review.`

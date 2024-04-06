@@ -3,12 +3,12 @@ import { GetAllReviewsForMovieId } from '../models/Review.js';
 import { GetUser } from '../models/User.js';
 import { calcStars } from '../scripts/rating.js';
 
-
 // get all movies details
 export const getAllMovies = async (req, res) => {
     try { 
         // get all movies
         const movies = await GetAllMovies();
+
         return res.render('movies', {
             session_username: req.session.user ? req.session.user.username : false,
             movies: movies

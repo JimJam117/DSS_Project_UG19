@@ -1,8 +1,7 @@
 import bcrypt from 'bcrypt'
 import sanitiseSQL from '../scripts/sanitiseSQL.js'
-import { GLOBAL_STORE } from '../index.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
-
+import { enum_timeout } from '../index.js'
 
 // login a user
 export const login = async (req, res) => {
@@ -16,7 +15,8 @@ export const login = async (req, res) => {
         const genericErrorMessage = "Username and / or password is incorrect."
    
         // if the cookie claims to be already authenticated, then cannot login!
-        if(req.session.authenticated) {   
+        if(req.session.authenticated) {  
+            await enum_timeout(req.startTime); // account enumeration timeout 
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 400, msg: "Bad Request"
@@ -29,27 +29,34 @@ export const login = async (req, res) => {
             // attempt to get the user by the username
             const user = await GetUserByUsername(username)
 
+
+
             // if user could not be found in the DB
             if (user === undefined) {
+                await enum_timeout(req.startTime); // account enumeration timeout
                 return res.status(401).render('signin', {
                     session_username: false,
                     error: genericErrorMessage
                 })
             }
             
+            const match = await bcrypt.compare(password, user.password);
+
             // if the password matches the inputted password
-            else if (user.password === password) {
+            if (match) {
                 
                 // set the session to authenticated
                 req.session.authenticated = true;
                 req.session.user = {id: user.id, username: username}
 
                 // redirect to homepage, now logged in
+                await enum_timeout(req.startTime); // account enumeration timeout
                 return res.redirect('/')
             } 
 
             // otherwise the password is incorrect
             else {
+                await enum_timeout(req.startTime); // account enumeration timeout
                 return res.status(401).render('signin', {
                     session_username: false,
                     error: genericErrorMessage
@@ -57,6 +64,7 @@ export const login = async (req, res) => {
             }
 
         } catch (error) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(500).render('signin', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error: "Something went wrong!"
@@ -65,6 +73,7 @@ export const login = async (req, res) => {
     
     }
     catch(err) {
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Something went wrong."
@@ -77,9 +86,10 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
 
     // destroy the session
-    req.session.destroy((err) => {
+    req.session.destroy(async (err) => {
         // if there is an error, render error page
         if (err) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(500).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 500, msg: `Something went wrong.`
@@ -87,6 +97,7 @@ export const logout = async (req, res) => {
         }
 
         // redirect home once session is closed
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.redirect('/')
     })
 }
@@ -100,12 +111,17 @@ export const register = async (req, res) => {
         const email = sanitiseSQL(req.body.email)
         const password = sanitiseSQL(req.body.password)
 
+        const salt = await bcrypt.genSalt()
+        const hash = await bcrypt.hash(password, salt)
+
+
         // attempt to find the user by username / email...
         const userByUsername = await GetUserByUsername(desiredUsername)
         const userByEmail = await GetUserByEmail(email)
 
         // as we need to check if the username / email already exist:
         if (userByUsername || userByEmail) {
+            await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('signup', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error: "That username / email already exists! Please log in."
@@ -113,21 +129,19 @@ export const register = async (req, res) => {
         }
 
         // if username / email is not present, we can create a new user
-        const newUser = await CreateUser(desiredUsername, email, password)
+        const newUser = await CreateUser(desiredUsername, email, hash)
 
         // add the credentials to the req object 
         req.body.uname = desiredUsername
         req.body.password = password
         
         // log the user in
+        await enum_timeout(req.startTime); // account enumeration timeout
         return await login(req, res)
     
-
-        // const salt = await bcrypt.genSalt()
-        // const hash = await bcrypt.hash(password, salt)
-
     }
     catch(err) {
+        await enum_timeout(req.startTime); // account enumeration timeout
         return res.status(500).json(err);
     } 
 }

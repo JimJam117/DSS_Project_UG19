@@ -1,27 +1,26 @@
-import express, { query } from 'express';
+import express from 'express';
 import {dirname} from 'path';
 import { fileURLToPath } from 'url';
-import pg from 'pg'
+import pg from 'pg';
 import { dbConfig } from './config/db_config.js';
-import {GetAllMovies} from './models/Movie.js'
-import {GetAllReviews} from './models/Review.js'
-import session from 'express-session'
-import bodyParser from 'body-parser'
+import session from 'express-session';
+import bodyParser from 'body-parser';
+import { setTimeout } from 'timers/promises';
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
 
 // Env variables
-const PORT = 5000;
-const SECRET = "secret code"
-const COOKIE = {
-    maxAge: 1000000, 
-    httpOnly: true,
-    secure: false // This should be set to true in production, not for localhost
+const PORT = 5000;                      // port to run server on
+const SECRET = "secret code shhhh";     // secret code for session id gen
+const MIN_TIME = 600;                   // Minimum time account-enumeration vunerable operations should take
+const COOKIE =                          // Session cookie settings
+{                        
+    maxAge: 1000000,                    // ~ 15 mins for demonstration 
+    httpOnly: true,                     //  Prevent session hijacking
+    secure: false                       //  This should be set to true in production, not possible for localhost as only http
 }
-
-// global store for sessions
-export const GLOBAL_STORE = new session.MemoryStore() 
+const GLOBAL_STORE = new session.MemoryStore() // global store for sessions
 
 // Start server
 const app = express(); 
@@ -29,17 +28,36 @@ const app = express();
 app.use(session({
     secret: SECRET,
     store: GLOBAL_STORE,
-    cookie: COOKIE, // approx 15 mins age for cookie, should be longer in prod
+    cookie: COOKIE, // approx 15 mins age for cookie, should be longer in production
     saveUninitialized: false,
     resave: true
 }))
 
+// Add a start time to all routes, this will be used to keep track of how long the
+// request has run for
+app.use(( req, res, next ) => {
+    req.startTime = Date.now();
+    next();
+});
+
+// Async function to delay if the request has taken less time than MIN_TIME
+// This is to equalise time and prevent account enumeration
+export async function enum_timeout(time) {
+    const actualTimeTaken = Date.now() - time
+    if (actualTimeTaken < MIN_TIME) {
+        await setTimeout(MIN_TIME - (actualTimeTaken))
+        console.log(`Req completed in ${actualTimeTaken}ms, delayed to ${Date.now() - time}ms`)
+    }
+}
+
 // resources are static
 app.use(express.static(current_dir + '/resources'));
+
+// JSON and body parsing
 app.use(express.json());
 app.use(bodyParser.urlencoded({
     extended: true
-  }));
+}));
 
 // ejs as view engine
 app.set('view engine', 'ejs')
@@ -47,11 +65,10 @@ app.set('view engine', 'ejs')
 // Listen on PORT
 app.listen(PORT, () => {console.log(`App started on port ${PORT}`)});
 
-
 // Database initialisation
 const client = new pg.Client(dbConfig); // client used for postgres
 await client.connect()
- 
+
 let dropTables = `
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS users;
@@ -111,13 +128,13 @@ CREATE TABLE IF NOT EXISTS reviews
 // add admin user and default users
 let addDefaultUsers = `
 INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('admin@movies.com','admin','password','true');
+    VALUES ('admin@movies.com','admin','$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By','true');
 
 INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('tom@movies.com','Tom F.','password','false');
+    VALUES ('tom@movies.com','Tom F.','$2b$10$oFDFM8oBs4k1BDnKfPBQ9.sl1f2ufnDzyv4aPEyiT77xiyUD6Wh4i','false');
 
 INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('john@movies.com','John H.','password','false');
+    VALUES ('john@movies.com','John H.','$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO','false');
 `
 
 // add movie records to DB
@@ -164,6 +181,7 @@ INSERT INTO reviews (rating,title,body,user_id,movie_id)
 
 `
 
+// Run queries to init database
 await client.query(dropTables)
 
 await client.query(usersCreateTable)
@@ -175,17 +193,15 @@ await client.query(addDefaultMovies)
 await client.query(reviewsCreateTable)
 await client.query(addDefaultReviews)
 
-
- 
 await client.end()
 
 
+// routes
 import genericRoutes from './routes/generic.js'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/user.js'
 import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
-
 
 app.use('/', genericRoutes);
 app.use('/auth', authRoutes);
