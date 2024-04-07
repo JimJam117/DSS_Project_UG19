@@ -65,16 +65,19 @@ app.set('view engine', 'ejs')
 // Listen on PORT
 app.listen(PORT, () => {console.log(`App started on port ${PORT}`)});
 
+/// ---------- DATABASE --------------
 // Database initialisation
 const client = new pg.Client(dbConfig); // client used for postgres
 await client.connect()
 
+// drop tables query, used to reset db
 let dropTables = `
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS movies;
 `
 
+// create users table query
 let usersCreateTable = `
 CREATE TABLE IF NOT EXISTS users 
 ( 
@@ -88,7 +91,7 @@ CREATE TABLE IF NOT EXISTS users
     CONSTRAINT users_username_unique UNIQUE (username)
 );
 `
-
+// create movies table query
 let moviesCreateTable = `
 CREATE TABLE IF NOT EXISTS movies
 (
@@ -102,7 +105,7 @@ CREATE TABLE IF NOT EXISTS movies
     CONSTRAINT movies_pkey_unique UNIQUE (id)
 );
 `
-
+// create reviews table query
 let reviewsCreateTable = `
 CREATE TABLE IF NOT EXISTS reviews
 (
@@ -124,8 +127,8 @@ CREATE TABLE IF NOT EXISTS reviews
         ON DELETE NO ACTION
 )
 `
-
-// add admin user and default users
+// add admin user and default users query
+// NOTE: All default user passwords are 'password'
 let addDefaultUsers = `
 INSERT INTO users (email,username,password,is_admin) 
     VALUES ('admin@movies.com','admin','$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By','true');
@@ -137,25 +140,25 @@ INSERT INTO users (email,username,password,is_admin)
     VALUES ('john@movies.com','John H.','$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO','false');
 `
 
-// add movie records to DB
+// add movie records to DB query
 let addDefaultMovies = `
 INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
-    values ('Dune','01/01/24','John Smith','cast','poster_1.png');
+    values ('Dune','04/04/24','Denis Villeneuve','Timothee Chalamet, Rebecca Ferguson, Oscar Isaac, Josh Brolin','poster_1.png');
 
 INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
-    VALUES ('The Taste of Things','01/01/24','John Smith','cast','poster_2.png');
+    VALUES ('The Taste of Things','01/01/24','Tran Anh Hung','Juliette Binoche, Benoit Magimel, Dodin Bouffant','poster_2.png');
 
 INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
-    VALUES ('Perfect Days','01/01/24','John Smith','cast','poster_3.png');
+    VALUES ('Perfect Days','03/03/24','Wim Wenders','Koji Yakusho, Tokio Emoto','poster_3.png');
 
 INSERT INTO movies (title,release_date,director,movie_cast,image_url) 
-    VALUES ('Shayda','01/01/24','John Smith','cast','poster_4.png');
+    VALUES ('Shayda','02/02/24','Noora Niasari',' Leah Purcell Zar Amir Ebrahimi','poster_4.png');
 `
 
-// Add default reviews
+// Add default reviews query
 let addDefaultReviews = `
 INSERT INTO reviews (rating,title,body,user_id,movie_id) 
-    VALUES ('3','Okay','
+    VALUES ('3','Perfect Days was okay','
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
             Tenetur dolore at velit cum consequatur dolores quam, alias odit 
             pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
@@ -163,7 +166,7 @@ INSERT INTO reviews (rating,title,body,user_id,movie_id)
             fugiat aspernatur!','2','3');
 
 INSERT INTO reviews (rating,title,body,user_id,movie_id) 
-    VALUES ('1','1 Star Bad','
+    VALUES ('1','I disliked like The Taste of Things','
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
             Tenetur dolore at velit cum consequatur dolores quam, alias odit 
             pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
@@ -171,14 +174,12 @@ INSERT INTO reviews (rating,title,body,user_id,movie_id)
             fugiat aspernatur!','2','2');
 
 INSERT INTO reviews (rating,title,body,user_id,movie_id) 
-    VALUES ('5','5 Stars good','
+    VALUES ('5','I liked Dune','
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
         Tenetur dolore at velit cum consequatur dolores quam, alias odit 
         pariatur recusandae sunt, laborum illo, veniam nobis amet molestiae 
         voluptatem provident tempore fuga qui a! Dolore nemo sunt, sed eligendi 
         fugiat aspernatur!','3','1');
-
-
 `
 
 // Run queries to init database
@@ -196,13 +197,15 @@ await client.query(addDefaultReviews)
 await client.end()
 
 
-// routes
+/// ---------- ROUTES --------------
+// routes import
 import genericRoutes from './routes/generic.js'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/user.js'
 import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
+// routes setup
 app.use('/', genericRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);

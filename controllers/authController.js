@@ -3,6 +3,35 @@ import sanitiseSQL from '../scripts/sanitiseSQL.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
 import { enum_timeout } from '../index.js'
 
+
+export const showSigninPage = async (req, res) => {
+
+    // if session is already authenticated, then redirect home
+    if(req.session.authenticated) {  
+        return res.redirect('/');
+    }
+
+    // else, render the page
+    res.render('signin', {
+        session_username: req.session.user ? req.session.user.username : false,
+        error: false
+    })
+}
+
+export const showSignupPage = async (req, res) => {
+
+    // if session is already authenticated, then redirect home
+    if(req.session.authenticated) {  
+        return res.redirect('/');
+    }
+
+    // else, render the page
+    res.render('signup', {
+        session_username: req.session.user ? req.session.user.username : false,
+        error: false
+    })
+}
+
 // login a user
 export const login = async (req, res) => {
 
@@ -14,7 +43,7 @@ export const login = async (req, res) => {
         // use a generic error message to prevent account enumeration
         const genericErrorMessage = "Username and / or password is incorrect."
    
-        // if the cookie claims to be already authenticated, then cannot login!
+        // if session is already authenticated, then cannot login!
         if(req.session.authenticated) {  
             await enum_timeout(req.startTime); // account enumeration timeout 
             return res.status(400).render('oops', {
