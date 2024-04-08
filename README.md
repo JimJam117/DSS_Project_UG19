@@ -46,3 +46,18 @@ npm run start
 
 After project has started, navigate to:
 ### [http://localhost:5000/](http://localhost:5000/)
+
+<br>
+
+## Project Layout
+The project follows an **MVC** (Model-View-Controller) design pattern:
+* **Route** files start with lowercase letters (e.g. `/routes/user.js`, `/routes/movie.js`). These files contain all the route definitions that link to corresponding controller functions
+  
+* **Controller** files (e.g. `/controllers/userController.js`, `/controllers/movieController.js`). These files contain all the functions to perform actions for a given route
+  
+* **Model** files start with uppercase letters (e.g. `/models/User.js`, `/models/Movie.js`). These files handle any database interactions. They are used within the controllers
+  
+* **View** files (e.g. `/views/user.ejs`, `/views/movie.ejs`) use the EJS view engine to render the frontend HTML / JS. These views are rendered at the end of a controller function
+
+ 
+Also, the `index.js` file contains the entrypoint and configuration for the project, along with database initialisation code. The database should reset each time the server is restarted.
