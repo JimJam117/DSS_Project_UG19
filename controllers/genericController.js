@@ -1,6 +1,8 @@
 import {GetAllReviews, GetAllReviewsForQuery} from '../models/Review.js'
 import {GetAllMovies, GetAllMoviesForQuery} from '../models/Movie.js'
 import {GetAllUsersForQuery} from '../models/User.js'
+import sanitiseSQL from '../scripts/sanitiseSQL.js';
+import htmlEncode from '../scripts/htmlEncode.js';
 
 // get homepage 
 export const getIndex = async (req, res) => {
@@ -28,6 +30,7 @@ export const postSearch = async (req, res) => {
         let results = []
 
         // TODO: This is the search query string, we need to sanatise this input
+        //let query = sanitiseSQL(req.body.query) 
         let query = req.body.query
 
         // fetch movies, reviews and users that match query (converted to lowercase for better search)
@@ -62,11 +65,18 @@ export const postSearch = async (req, res) => {
             })
         }
 
+        //encodes each element of the results the array as strings
+        const htmlEncodedResults = results.map(result => ({
+            name: htmlEncode(result.name),
+            url: htmlEncode(result.url),
+            type: htmlEncode(result.type)
+        }));
+        
         // return the results and original query
         return res.render('search', {
             session_username: req.session.user ? req.session.user.username : false,
-            results: results,
-            query: query
+            results: htmlEncodedResults,
+            query: htmlEncode(query)
         })
     }
 

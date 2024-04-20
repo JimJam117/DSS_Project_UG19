@@ -4,6 +4,7 @@ import {GetUser} from '../models/User.js'
 import { calcStars } from '../scripts/rating.js';
 import sanitiseSQL from '../scripts/sanitiseSQL.js';
 import { enum_timeout } from '../index.js';
+import htmlEncode from '../scripts/htmlEncode.js';
 
 // get all reviews details
 export const getAllReviews = async (req, res) => {
@@ -48,10 +49,10 @@ export const getReview = async (req, res) => {
         return res.render('review', { 
                 session_username: req.session.user ? req.session.user.username : false,
                 movie_title: movie.title,
-                review_title: review.title,
+                review_title: htmlEncode(review.title),
                 review_id: review.id,
-                review_body: review.body,
-                review_username: user.username,
+                review_body: htmlEncode(review.body),
+                review_username: htmlEncode(user.username),
                 review_userid: user.id,
                 movie_id: movie.id,
                 reviewBelongsToSessionUser: reviewBelongsToSessionUser,
