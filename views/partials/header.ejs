@@ -1,42 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self' resources/;
+        img-src 'self' resources/;
+        font-src 'self';
+        frame-src 'self';
+        connect-src 'self'; 
+        report-to /report
+    ">
 
     <link rel="stylesheet" href="/styles/main.css">
-
     <title>Movie Blog</title>
 </head>
+
 <body>
 
     <!-- TopBar -->
     <div class="topbar">
-        <a class="blog_title" href="/"><h1>Movie Blog</h1></a>
-        
+        <a class="blog_title" href="/">
+            <h1>Movie Blog</h1>
+        </a>
+
         <div class="topbar-right">
 
             <nav>
-                
-                <% if (session_username) {  %>
+
+                <% if (session_username) { %>
                     <form action="/auth/logout" method="post" content-type="application/json">
                         <a class="navbar_link" href="/movie">Films</a>
                         <a class="navbar_link" href="/review/create">New Review</a>
                         <button class="navbar_link" type="submit">Logout</button>
                         <span class="navbar_link logged_in_msg">Logged in as: <%= session_username %></span>
                     </form>
-                    
-                <% } else { %>
-                    <a class="navbar_link" href="/movie">Films</a>
-                    <a class="navbar_link" href="/auth/signup">Create Account</a>
-                    <a class="navbar_link" href="/auth/signin">Sign In</a>
-                <% } %>
+
+                    <% } else { %>
+                        <a class="navbar_link" href="/movie">Films</a>
+                        <a class="navbar_link" href="/auth/signup">Create Account</a>
+                        <a class="navbar_link" href="/auth/signin">Sign In</a>
+                        <% } %>
             </nav>
-            
+
             <form action="/search" method="post" content-type="application/json">
-                <input type="text" name="query" class="search" id="query" placeholder="Search... 🔎"  />
+                <input type="text" name="query" class="search" id="query" placeholder="Search... 🔎" />
                 <button type="submit" hidden>Submit</button>
             </form>
-            
+
         </div>
-</div>
+    </div>

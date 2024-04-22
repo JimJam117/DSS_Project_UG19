@@ -29,9 +29,7 @@ export const postSearch = async (req, res) => {
         // results array
         let results = []
 
-        // TODO: This is the search query string, we need to sanatise this input
-        //let query = sanitiseSQL(req.body.query) 
-        let query = req.body.query
+        let query = sanitiseSQL(req.body.query) 
 
         // fetch movies, reviews and users that match query (converted to lowercase for better search)
         const movies = await GetAllMoviesForQuery(query.toLowerCase());
