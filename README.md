@@ -42,7 +42,24 @@ npm i
 npm run start
 ```
 
+<be>
+
 <br>
+
+## HTTPS certificate setup 
+1. Install mkcert:
+```
+choco install mkcert
+```
+
+2. Navigate to the certificate folder and install the certificate on your machine
+```
+mkcert -install
+```
+
+
+
+
 
 After project has started, navigate to:
 ### [http://localhost:5000/](http://localhost:5000/)
