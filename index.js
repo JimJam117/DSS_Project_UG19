@@ -11,10 +11,6 @@ import fs from 'fs'
 import https from 'https'
 import path from 'path'
 
-const options = {
-    cert: fs.readFileSync('certificate/cert.pem', 'utf-8'),
-    key: fs.readFileSync('certificate/key.pem', 'utf-8')
-};
 
 
 // Get current directory
@@ -28,7 +24,7 @@ const COOKIE =                          // Session cookie settings
 {
     maxAge: 1000000,                    // ~ 15 mins for demonstration 
     httpOnly: true,                     //  Prevent session hijacking
-    secure: false                       //  This should be set to true in production, not possible for localhost as only http
+    secure: true                        //  Changed for HTTPS
 }
 const GLOBAL_STORE = new session.MemoryStore() // global store for sessions
 
@@ -82,7 +78,16 @@ app.use(setFrameOptions);
 app.set('view engine', 'ejs')
 
 // Listen on PORT
-app.listen(PORT, () => { console.log(`App started on port ${PORT}`) });
+//* app.listen(PORT, () => { console.log(`App started on port ${PORT}`) });
+const options = {
+    cert: fs.readFileSync('certificate/localhost.pem'),
+    key: fs.readFileSync('certificate/localhost-key.pem')
+};
+
+// Create HTTPS server
+https.createServer(options, app).listen(PORT, () => {
+    console.log(`App started on port ${PORT}`);
+});
 
 /// ---------- DATABASE --------------
 // Database initialisation

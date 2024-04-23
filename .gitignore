@@ -1,1 +1,3 @@
 node_modules
+certificate/localhost.pem
+certificate/localhost-key.pem
