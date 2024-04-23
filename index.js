@@ -67,7 +67,7 @@ app.use(bodyParser.urlencoded({
 
 // click-jacking middleware
 const setFrameOptions = (req, res, next) => {
-    // prevents the page from being embedded in a frame
+    // prevents the page from being embedded in an iframe
     res.setHeader('X-Frame-Options', 'DENY');
     next();
 };

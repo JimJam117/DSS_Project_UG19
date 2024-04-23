@@ -5,6 +5,7 @@ import { calcStars } from '../scripts/rating.js';
 import sanitiseSQL from '../scripts/sanitiseSQL.js';
 import { enum_timeout } from '../index.js';
 import htmlEncode from '../scripts/htmlEncode.js';
+import stringFirewallTest from '../scripts/firewall.js';
 
 // get all reviews details
 export const getAllReviews = async (req, res) => {
@@ -12,9 +13,11 @@ export const getAllReviews = async (req, res) => {
         // get all reviews
         const reviews = await GetAllReviews();
 
+        const checkedReviews = reviews.filter(review => !stringFirewallTest(review.title) && !stringFirewallTest(review.body));
+
         return res.render('reviews', {
             session_username: req.session.user ? req.session.user.username : false,
-            reviews: reviews,
+            reviews: checkedReviews,
         })
     }
     catch(err) {
@@ -28,7 +31,16 @@ export const getAllReviews = async (req, res) => {
 // get single review details
 export const getReview = async (req, res) => {
     try { 
+        // check firewall first
         const review = await GetReview(req.params.id);
+
+        if (stringFirewallTest(review.title) || stringFirewallTest(review.body) || stringFirewallTest(user.username)) {
+            return res.status(403).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false,
+                error_code: 403, msg: `This review violates are security policies.`
+            })   
+        }
+        
         const movie = await GetMovie(review.movie_id);
         const user = await GetUser(review.user_id);
       
@@ -114,6 +126,14 @@ export const showCreateReviewForm = async (req, res) => {
 // Register a new review
 export const createReview = async (req, res) => {
     try { 
+
+        // Test the body and title for possible firewall violations (this is the first line of defence)
+        if (stringFirewallTest(req.body.body) || stringFirewallTest(req.body.title)) {
+            return res.status(403).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false,
+                error_code: 403, msg: `Your review violated our security policies`
+            })   
+        }
 
         // Get details from req object. Sanatise all for safety
         const title = sanitiseSQL(req.body.title)

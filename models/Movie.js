@@ -38,7 +38,7 @@ export const GetAllMoviesForQuery = async (query) => {
         const client = new pg.Client(dbConfig)
         await client.connect()
         const movies = await client.query(`SELECT * FROM movies WHERE LOWER(title) LIKE '%${query}%' OR LOWER(director) LIKE '%${query}%' OR LOWER(movie_cast) LIKE '%${query}%'`)
-        console.log("mv:",movies)
+        //* console.log("mv:",movies)
         return(movies.rows)
     }
     catch(err) {
