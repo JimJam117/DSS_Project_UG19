@@ -11,7 +11,7 @@
         <% results.forEach(function(result){ %>
             <li>
                 <a href="<%= result.url %>" class="">
-                        <strong><%= result.type %>:</strong> <%= result.name %>
+                        <strong><%- result.type %>:</strong> <%- result.name %>
                 </a>
             </li>
             <% }); %>

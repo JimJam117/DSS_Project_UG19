@@ -137,3 +137,14 @@ body {
     border: 1px solid rgb(140, 45, 45);
     padding: 3px;
 }
+
+/* footer */
+
+.footer {
+    text-align: center;
+}
+
+.footer-link {
+    color: aqua;
+    text-decoration: none;
+}

@@ -1,6 +1,7 @@
 import {GetAllMovies, GetMovie} from '../models/Movie.js'
 import { GetAllReviewsForMovieId } from '../models/Review.js';
 import { GetUser } from '../models/User.js';
+import stringFirewallTest from '../scripts/firewall.js';
 import { calcStars } from '../scripts/rating.js';
 
 // get all movies details
@@ -36,6 +37,11 @@ export const getMovie = async (req, res) => {
         let reviewsAverage = 0
 
         for (const review of reviews) {
+            //check that the reviewer hasn't found a way past the secuity measures
+            if (stringFirewallTest(review.body)) {
+                console.error("firewall violation detected, skipping this review")
+                continue;
+            }
 
             // get user for this review
             const user = await GetUser(review.user_id)
@@ -69,7 +75,7 @@ export const getMovie = async (req, res) => {
         })
     }
     catch(err) {
-        return res.status('500').render('oops', {
+        return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Generic Error"
         })

@@ -1,11 +1,17 @@
 import express from 'express';
-import {dirname} from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { dbConfig } from './config/db_config.js';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import { setTimeout } from 'timers/promises';
+
+import fs from 'fs'
+import https from 'https'
+import path from 'path'
+
+
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -15,15 +21,15 @@ const PORT = 5000;                      // port to run server on
 const SECRET = "secret code shhhh";     // secret code for session id gen
 const MIN_TIME = 600;                   // Minimum time account-enumeration vunerable operations should take
 const COOKIE =                          // Session cookie settings
-{                        
+{
     maxAge: 1000000,                    // ~ 15 mins for demonstration 
     httpOnly: true,                     //  Prevent session hijacking
-    secure: false                       //  This should be set to true in production, not possible for localhost as only http
+    secure: true                        //  Changed for HTTPS
 }
 const GLOBAL_STORE = new session.MemoryStore() // global store for sessions
 
 // Start server
-const app = express(); 
+const app = express();
 
 app.use(session({
     secret: SECRET,
@@ -35,7 +41,7 @@ app.use(session({
 
 // Add a start time to all routes, this will be used to keep track of how long the
 // request has run for
-app.use(( req, res, next ) => {
+app.use((req, res, next) => {
     req.startTime = Date.now();
     next();
 });
@@ -59,11 +65,29 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+// click-jacking middleware
+const setFrameOptions = (req, res, next) => {
+    // prevents the page from being embedded in an iframe
+    res.setHeader('X-Frame-Options', 'DENY');
+    next();
+};
+
+app.use(setFrameOptions);
+
 // ejs as view engine
 app.set('view engine', 'ejs')
 
 // Listen on PORT
-app.listen(PORT, () => {console.log(`App started on port ${PORT}`)});
+//* app.listen(PORT, () => { console.log(`App started on port ${PORT}`) });
+const options = {
+    cert: fs.readFileSync('certificate/localhost.pem'),
+    key: fs.readFileSync('certificate/localhost-key.pem')
+};
+
+// Create HTTPS server
+https.createServer(options, app).listen(PORT, () => {
+    console.log(`App started on port ${PORT}`);
+});
 
 /// ---------- DATABASE --------------
 // Database initialisation
@@ -205,9 +229,13 @@ import userRoutes from './routes/user.js'
 import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
+import reportRoutes from './routes/report.js'
+
 // routes setup
 app.use('/', genericRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/movie', movieRoutes);
 app.use('/review', reviewRoutes);
+
+app.use('/report', reportRoutes);

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import sanitiseSQL from '../scripts/sanitiseSQL.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
 import { enum_timeout } from '../index.js'
+import stringFirewallTest from '../scripts/firewall.js'
 
 
 export const showSigninPage = async (req, res) => {
@@ -34,8 +35,13 @@ export const showSignupPage = async (req, res) => {
 
 // login a user
 export const login = async (req, res) => {
-
     try { 
+        if (stringFirewallTest(req.body.uname) || stringFirewallTest(req.body.password)) {
+            return res.status(403).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false,
+                error_code: 403, msg: `Your login credentials violated our security policies.`
+            })   
+        }
         // sanatise the inputs
         const username = sanitiseSQL(req.body.uname)
         const password = sanitiseSQL(req.body.password)
@@ -54,11 +60,8 @@ export const login = async (req, res) => {
 
         // check if the username / password is valid
         try {
-
             // attempt to get the user by the username
             const user = await GetUserByUsername(username)
-
-
 
             // if user could not be found in the DB
             if (user === undefined) {
@@ -134,7 +137,12 @@ export const logout = async (req, res) => {
 // Register a new user
 export const register = async (req, res) => {
     try { 
-
+        if (stringFirewallTest(req.body.uname) || stringFirewallTest(req.body.email) || stringFirewallTest(req.body.password)) {
+            return res.status(403).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false,
+                error_code: 403, msg: `Your signup credentials violated our security policies, please try again.`
+            })   
+        }
         // Get details from req object
         const desiredUsername = sanitiseSQL(req.body.uname)
         const email = sanitiseSQL(req.body.email)
