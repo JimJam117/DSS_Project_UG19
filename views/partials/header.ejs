@@ -34,15 +34,15 @@
                 <% if (session_username) { %>
                     <form action="/auth/logout" method="post" content-type="application/json">
                         <a class="navbar_link" href="/movie">Films</a>
-                        <a class="navbar_link" href="/review/create">New Review</a>
-                        <button class="navbar_link" type="submit">Logout</button>
+                        <a id="new_review" class="navbar_link" href="/review/create">New Review</a>
+                        <button id="logout" class="navbar_link" type="submit">Logout</button>
                         <span class="navbar_link logged_in_msg">Logged in as: <%= session_username %></span>
                     </form>
 
                     <% } else { %>
                         <a class="navbar_link" href="/movie">Films</a>
-                        <a class="navbar_link" href="/auth/signup">Create Account</a>
-                        <a class="navbar_link" href="/auth/signin">Sign In</a>
+                        <a class="navbar_link" id="new_account" href="/auth/signup">Create Account</a>
+                        <a class="navbar_link" id="login" href="/auth/signin">Sign In</a>
                         <% } %>
             </nav>
 

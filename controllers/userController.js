@@ -9,7 +9,11 @@ export const getAllUsers = async (req, res) => {
     try { 
         // get all users
         const users = await GetAllUsers();
-        const checkedUsers = users.map(user => !stringFirewallTest(user));
+        const checkedUsers = users.map(user => {
+            if (!stringFirewallTest(user)) {
+                return user
+            }  
+        });
 
         return res.render('users', {
             session_username: req.session.user ? req.session.user.username : false,

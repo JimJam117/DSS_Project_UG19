@@ -34,7 +34,7 @@ export const getReview = async (req, res) => {
         // check firewall first
         const review = await GetReview(req.params.id);
 
-        if (stringFirewallTest(review.title) || stringFirewallTest(review.body) || stringFirewallTest(user.username)) {
+        if (stringFirewallTest(review.title) || stringFirewallTest(review.body)) {
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 403, msg: `This review violates are security policies.`
