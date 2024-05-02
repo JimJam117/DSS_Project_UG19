@@ -26,6 +26,7 @@ export const dbConfig = {
 
 <br>
 
+
 ## Project setup
 1. First clone this repo:
 ```
