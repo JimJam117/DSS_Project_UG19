@@ -1,7 +1,10 @@
-import { GetAllUsers } from '../models/User.js';
-import {GetAllMovies, GetMovie} from '../models/Movie.js'
+import { GetAllUsers, GetAllUsersForQuery, CreateUser } from '../models/User.js';
+import {GetAllMovies, GetAllMoviesForQuery, GetMovie} from '../models/Movie.js'
+import { GetAllReviews, GetAllReviewsForMovieId, GetAllReviewsForQuery, GetAllReviewsForUserId } from '../models/Review.js';
 import { build_webdriver } from '../config/webdriver_config.js';
 import { By } from 'selenium-webdriver';
+import { assert } from 'chai';
+import sanitiseSQL from '../scripts/sanitiseSQL.js';
 
 // define a test, provide a test name and a callback that returns [boolean: testResult and string:failureMsg]  
 export const Test = async (testName, testCallback) => {
@@ -20,57 +23,6 @@ export const Test = async (testName, testCallback) => {
     catch (e) {
         console.log(`TEST FAILED (ERROR): ${testName} - ${e}`)
     }
-}
-
-// Run all the tests
-export const runUnitTests = async () => {
-    
-    // Find all movies test
-    Test("FindMoviesTest", async () => {
-        const movies = await GetAllMovies();
-        
-        // is there 4 movies in the DB?
-        const movieCountIs4 = movies.length === 4
-        
-        // is Dune in the movies array?
-        let dunePresent = false
-
-        for (const movie of movies) {
-            if (movie.title === "Dune") {
-                dunePresent = true
-            }
-        }
-
-        let failureMsg = ''
-        if (!dunePresent) { failureMsg += "Dune is not in the movies array. "}
-        if (!movieCountIs4) { failureMsg += "There are not 4 movies. "}
-
-        return [movieCountIs4 && dunePresent, failureMsg]
-    });
-
-
-    // Find all users test
-    Test("FindUsersTest", async () => {
-        const users = await GetAllUsers();
-        
-        // is there at least 3 users in the DB?
-        const atLeast3Users = users.length >= 3
-        
-        // is Admin in the movies array?
-        let adminPresent = false
-
-        for (const user of users) {
-            if (user.username === "admin") {
-                adminPresent = true
-            }
-        }
-
-        let failureMsg = ''
-        if (!adminPresent) { failureMsg += "Admin is not in the user array. "}
-        if (!atLeast3Users) { failureMsg += "There are not at least 3 users. "}
-
-        return [atLeast3Users && adminPresent, failureMsg]
-    });
 }
 
 // Selenium End to End Tests

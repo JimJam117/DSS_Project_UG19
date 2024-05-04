@@ -230,7 +230,7 @@ import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
 import reportRoutes from './routes/report.js'
-import { runUnitTests, runSeleniumTests } from './tests/Tests.js';
+import { runSeleniumTests } from './test/Tests.js';
 
 // routes setup
 app.use('/', genericRoutes);
@@ -241,5 +241,4 @@ app.use('/review', reviewRoutes);
 
 app.use('/report', reportRoutes);
 
-runUnitTests();
-runSeleniumTests();
+// /runSeleniumTests();
