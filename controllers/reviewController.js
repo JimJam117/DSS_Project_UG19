@@ -23,7 +23,7 @@ export const getAllReviews = async (req, res) => {
     catch(err) {
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not get reviews"
         })
     } 
 }
@@ -75,7 +75,7 @@ export const getReview = async (req, res) => {
         console.log(err)
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not get review"
         })
     } 
 }
@@ -118,7 +118,7 @@ export const showCreateReviewForm = async (req, res) => {
     catch(err) {
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not load review form"
         })
     } 
 }

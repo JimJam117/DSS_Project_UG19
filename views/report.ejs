@@ -3,10 +3,20 @@
 
     <!-- Oops Section -->
     <div class="section">
-        <h1>There's something no quite right...</h1>
-        <h2>We have logged this and we will get back to you.</h2>
-        <!-- TODO: add report form and POST submittion point -->
-        <p>TODO: There should be a form here to sumbit a security error</p>
+        <h1>Sorry about that</h1>
+
+        <% if(!reportSubmitted) { %>
+            <h2>Reporting something that doesn't look right will help to improve our website</h2>
+            <form action="/report" method="post" content-type="json">
+                <textarea class="report_textarea" type="text" id="details" name="details" placeholder="Could you give us more details..."></textarea><br>
+                <input type="submit" value="Submit Report">
+            </form>
+        <% } %>
+        <% if(reportSubmitted) { %>
+            <h2>Thank you, we will try to resolve this issue as soon as possible</h2>
+        <% } %>
+
+
 
         <hr>
         

@@ -3,10 +3,10 @@
 
     <!-- Oops Section -->
     <div class="section">
-        <h1>Oops!</h1>
+        <h1>Something has gone wrong...</h1>
         <hr>
         <% if(error_code) { %>
-            <h3><%= error_code %></h3>
+            <h3>Error Code: <%= error_code %></h3>
         <% } %>
         
         <% if(msg) { %>
@@ -14,6 +14,9 @@
         <% } else { %>
             <p>An error occurred.</p>
         <% } %>
+        <p>
+            <a href="/report">Report this error to improve our site</a>
+        </p>
         
         <p>
             <a href="/">Return to home page</a>

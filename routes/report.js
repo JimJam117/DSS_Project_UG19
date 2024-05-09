@@ -5,7 +5,7 @@ import { getPage, postReport } from "../controllers/reportController.js"
 const router = Router();
 
 router.get('/', getPage);
-router.post('/post-report', postReport);
+router.post('/', postReport);
 
 
 export default router;

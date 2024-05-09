@@ -1,14 +1,15 @@
+import sanitiseSQL from '../scripts/sanitiseSQL.js';
 
 
 // get page route
 export const getPage = async (req, res) => {
     try {
-        postReport(req);
-        //console.log("sdashs")
+        //postReport(req);
         return res.render('report', {
             session_username: req.session.user ? req.session.user.username : false,
+            reportSubmitted: false
         })
-    } 
+    }
     catch (err) {
         res.status(500).render('oops', { error_code: 500, msg: "Generic Error" });
     }
@@ -17,21 +18,21 @@ export const getPage = async (req, res) => {
 // post report route
 export const postReport = async (req, res) => {
     try {
+        const reportData = [
+            ["errorCode", req.session.errorCode],
+            ["details", sanitiseSQL(req.body.details)],
+            ["browser", req.headers['sec-ch-ua']],
+            ["timestamp", new Date().toISOString()]
+        ];
+        console.log("reportData: ", reportData)
 
-        const reportData = {
-            userAgent: req.headers['user-agent'],
-            referer: req.headers['referer'],
-            origin: req.headers['origin'],
-            body: req.body
-        };
-        console.log(req.headers)
+        return res.render('report', {
+            session_username: req.session.user ? req.session.user.username : false,
+            reportSubmitted: true
+        })
 
-        console.log('CSP Violation Report:', reportData);
-
-        //res.status(200).send('Report received and logged.');
-        
-    } 
+    }
     catch (err) {
-       
+
     }
 };
