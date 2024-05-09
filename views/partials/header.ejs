@@ -33,6 +33,7 @@
 
                 <% if (session_username) { %>
                     <form action="/auth/logout" method="post" content-type="application/json">
+                        <input hidden id="csrf" name="csrfToken" value="<%= csrf_token %>">
                         <a class="navbar_link" href="/movie">Films</a>
                         <a id="new_review" class="navbar_link" href="/review/create">New Review</a>
                         <button id="logout" class="navbar_link" type="submit">Logout</button>

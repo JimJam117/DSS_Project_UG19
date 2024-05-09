@@ -16,7 +16,8 @@ export const getIndex = async (req, res) => {
 
         // render homepage
         return res.render('index', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             movies: movies,
             reviews: checkedReviews
         })
@@ -38,7 +39,8 @@ export const postSearch = async (req, res) => {
         else {
             console.log("firewall violation!")
             return res.status(500).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 500, msg: "Generic Error"
             })
         }
@@ -86,7 +88,8 @@ export const postSearch = async (req, res) => {
 
         // return the results and original query
         return res.render('search', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             results: htmlEncodedResults,
             query: htmlEncode(query)
         })
@@ -96,7 +99,8 @@ export const postSearch = async (req, res) => {
     catch (err) {
         console.log(err)
         return res.status(500).render('oops', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Generic Error"
         })
     }
