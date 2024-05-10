@@ -138,6 +138,22 @@ body {
     padding: 3px;
 }
 
+#otp-pass-input {
+    width: 250px;
+}
+
+.otp-guide {
+    text-align: left;
+}
+
+.otp-guide ul {
+    width: 500px;
+}
+
+.otp-guide li{
+    padding-bottom: 20px;
+}
+
 /* footer */
 
 .footer {

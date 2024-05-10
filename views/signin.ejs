@@ -11,6 +11,17 @@
         <label hidden for="password">password:</label><br>
         <input type="password" id="password" name="password" placeholder="Password"><br><br>
 
+        <hr>
+        <br>
+        <h3>Two Factor Code:</h3>
+        <label hidden for="otp-pass">Verify Code:</label><br>
+        <input type="text" id="otp-pass-input" name="otp_token" placeholder="Enter the code on your device">
+
+        <br><br><hr><br>
+
+
+
+
         <% if(error) { %>
             <p class="error"><%= error %></p>
         <% } %>
