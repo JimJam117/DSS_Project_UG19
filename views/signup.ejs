@@ -31,8 +31,8 @@
     </div>
     <br>
         <hr>
-        <p>OTP Secret: <%= otp_secret_text %></p>
-        <input type="hidden" id="otp-secret-text" name="otp_secret_text" value="<%= otp_secret_text %>">
+        <p>OTP Secret: <span id="otp-secret-text"><%= otp_secret_text %></span></p>
+        <input type="hidden" name="otp_secret_text" value="<%= otp_secret_text %>">
         <input type="hidden" id="otp-qr-code-data" name="qrcode_data_string" value="<%- qrcode_data_string %>">
         <img src="<%- qrcode_data_string %>" alt="One Time Password Setup QR Code">
         <br>

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import sanitiseSQL from '../scripts/sanitiseSQL.js'
-import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
+import { GetUserByUsername, CreateUser, CheckUserWithEmailExists } from '../models/User.js'
 import { CSRF_TOKEN, ENCRYPTION_KEY, enum_timeout } from '../index.js'
 import stringFirewallTest from '../scripts/firewall.js'
 import speakeasy from 'speakeasy'
@@ -219,19 +219,18 @@ export const register = async (req, res) => {
         const password_salt = await bcrypt.genSalt()
         const password_hash = await bcrypt.hash(password, password_salt)
 
-
         // attempt to find the user by username / email...
         const userByUsername = await GetUserByUsername(desiredUsername)
-        const userByEmail = await GetUserByEmail(email)
+        const userWithEmailExists = await CheckUserWithEmailExists(email)
 
         // as we need to check if the username / email already exist:
-        if (userByUsername || userByEmail) {
+        if (userByUsername || userWithEmailExists) {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('signup', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-                otp_secret_text: otp_secret_text,
-                qrcode_data_string: qrcode_data_string,
+                otp_secret_text: req.body.otp_secret_text,
+                qrcode_data_string: req.body.qrcode_data_string,
                 error: "That username / email already exists! Please log in."
             })
         }

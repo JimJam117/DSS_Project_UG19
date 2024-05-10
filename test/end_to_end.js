@@ -5,6 +5,7 @@ import { build_webdriver } from '../config/webdriver_config.js';
 import { By } from 'selenium-webdriver';
 import { assert } from 'chai';
 import sanitiseSQL from '../scripts/sanitiseSQL.js';
+import speakeasy from 'speakeasy'
 
 // define a test, provide a test name and a callback that returns [boolean: testResult and string:failureMsg]  
 export const Test = async (testName, testCallback) => {
@@ -44,6 +45,7 @@ export const runSeleniumTests = async () => {
 
         // is 'username / email already exists' text visible?
         let error_msg = await driver.findElement(By.className('error')).getText();
+        
         if (error_msg != "That username / email already exists! Please log in.") {
             driver.quit()
             return [false, "Could not find 'That username / email already exists! Please log in.' error for already used email."]
@@ -72,10 +74,52 @@ export const runSeleniumTests = async () => {
         await driver.findElement(By.id('uname')).clear();
         await driver.findElement(By.id('password')).clear();
 
-        // enter correct details
+        // enter correct details (Without OTP)
         await driver.findElement(By.id('email')).sendKeys("test@test.com");
         await driver.findElement(By.id('uname')).sendKeys("TestUser");
         await driver.findElement(By.id('password')).sendKeys("TestUser");
+        await driver.findElement(By.id('submit')).click();
+
+        // is 'The 2FA token could not be verifed for the secret. Please try again' text visible?
+        error_msg = await driver.findElement(By.className('error')).getText();
+        if (error_msg != "The 2FA token could not be verifed for the secret. Please try again") {
+            driver.quit()
+            return [false, "Could not find 'The 2FA token could not be verifed for the secret. Please try again' error for already used username."]
+        }
+
+        // clear inputs
+        await driver.findElement(By.id('email')).clear();
+        await driver.findElement(By.id('uname')).clear();
+        await driver.findElement(By.id('password')).clear();
+
+        // enter correct details (With incorrect OTP)
+        await driver.findElement(By.id('email')).sendKeys("test@test.com");
+        await driver.findElement(By.id('uname')).sendKeys("TestUser");
+        await driver.findElement(By.id('password')).sendKeys("TestUser");
+        await driver.findElement(By.id('otp-pass-input')).sendKeys("000000");
+        await driver.findElement(By.id('submit')).click();
+
+        // is 'The 2FA token could not be verifed for the secret. Please try again' text visible?
+        error_msg = await driver.findElement(By.className('error')).getText();
+        if (error_msg != "The 2FA token could not be verifed for the secret. Please try again") {
+            driver.quit()
+            return [false, "Could not find 'The 2FA token could not be verifed for the secret. Please try again' error for already used username."]
+        }
+
+        // clear inputs
+        await driver.findElement(By.id('email')).clear();
+        await driver.findElement(By.id('uname')).clear();
+        await driver.findElement(By.id('password')).clear();
+
+        // enter correct details (With incorrect OTP)
+        await driver.findElement(By.id('email')).sendKeys("test@test.com");
+        await driver.findElement(By.id('uname')).sendKeys("TestUser");
+        await driver.findElement(By.id('password')).sendKeys("TestUser");
+
+        const secret = await driver.findElement(By.id('otp-secret-text')).getText();
+        const token = speakeasy.totp({ secret: secret });
+        
+        await driver.findElement(By.id('otp-pass-input')).sendKeys(token);
         await driver.findElement(By.id('submit')).click();
 
         // is 'logged in as ...' text is visible?
@@ -131,11 +175,40 @@ export const runSeleniumTests = async () => {
         await driver.findElement(By.id('uname')).clear();
         await driver.findElement(By.id('password')).clear();
         
-        // submit correct login details for test user Tom F.
+        // submit correct login details for test user Tom F. (without OTP)
         await driver.findElement(By.id('uname')).sendKeys("Tom F.");
         await driver.findElement(By.id('password')).sendKeys("password");
         await driver.findElement(By.id('submit')).click();
 
+        // is 'The 2FA token could not be verifed for the secret. Please try again' text visible?
+        error_msg = await driver.findElement(By.className('error')).getText();
+        if (error_msg != "The 2FA token could not be verifed for the secret. Please try again") {
+            driver.quit()
+            return [false, "Could not find 'The 2FA token could not be verifed for the secret. Please try again' error for already used username."]
+        }
+
+        // submit correct login details for test user Tom F. (with incorrect OTP)
+        await driver.findElement(By.id('uname')).sendKeys("Tom F.");
+        await driver.findElement(By.id('password')).sendKeys("password");
+        await driver.findElement(By.id('otp-pass-input')).sendKeys('00000');
+
+        await driver.findElement(By.id('submit')).click();
+
+        // is 'The 2FA token could not be verifed for the secret. Please try again' text visible?
+        error_msg = await driver.findElement(By.className('error')).getText();
+        if (error_msg != "The 2FA token could not be verifed for the secret. Please try again") {
+            driver.quit()
+            return [false, "Could not find 'The 2FA token could not be verifed for the secret. Please try again' error for already used username."]
+        }
+
+        // submit correct login details for test user Tom F. (with correct OTP)
+        await driver.findElement(By.id('uname')).sendKeys("Tom F.");
+        await driver.findElement(By.id('password')).sendKeys("password");
+        const secret = 'D/VR7nfZf}.Ueq]4Pv$F^,zS#mJxI<0m'; 
+        const token = speakeasy.totp({ secret: secret, encoding: 'ascii' });
+        await driver.findElement(By.id('otp-pass-input')).sendKeys(token);
+        await driver.findElement(By.id('submit')).click();
+        
         // is 'logged in as ...' text is visible?
         let logged_in_msg = await driver.findElement(By.className('logged_in_msg')).getText();
         if (logged_in_msg != "Logged in as: Tom F.") {
@@ -168,6 +241,9 @@ export const runSeleniumTests = async () => {
         await driver.findElement(By.id('login')).click();
         await driver.findElement(By.id('uname')).sendKeys("John H.");
         await driver.findElement(By.id('password')).sendKeys("password");
+        const secret = 'D/VR7nfZf}.Ueq]4Pv$F^,zS#mJxI<0m'; 
+        const token = speakeasy.totp({ secret: secret, encoding: 'ascii' });
+        await driver.findElement(By.id('otp-pass-input')).sendKeys(token);
         await driver.findElement(By.id('submit')).click();
         
         // attempt to find test review (should not be present)
@@ -257,7 +333,7 @@ export const runSeleniumTests = async () => {
         // test passed
         driver.quit()
         return [true, ""]
-    })
-
-    
+    })    
 }
+
+runSeleniumTests()
