@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt'
 import sanitiseSQL from '../scripts/sanitiseSQL.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
-import { CSRF_TOKEN, enum_timeout } from '../index.js'
+import { CSRF_TOKEN, ENCRYPTION_KEY, enum_timeout } from '../index.js'
 import stringFirewallTest from '../scripts/firewall.js'
 import speakeasy from 'speakeasy'
 import { toDataURL } from 'qrcode'
+import Cryptr from 'cryptr'
 
 export const showSigninPage = async (req, res) => {
 
@@ -101,14 +102,17 @@ export const login = async (req, res) => {
                 })
             }
             
-            const match = await bcrypt.compare(password, user.password);
-
-            // if the password matches the inputted password
-            if (match) {
+            const password_match = await bcrypt.compare(password, user.password);
+            
+            // if the password hash matches the inputted password
+            if (password_match) {
+                // decrypt the OTP secret
+                const cryptr = new Cryptr(ENCRYPTION_KEY);
+                const decrypted_otp_secret = cryptr.decrypt(user.otp_secret);
 
                 // verify the OTP is correct
                 const otp_is_verifed = speakeasy.totp.verify({
-                    secret: user.otp_secret,
+                    secret: decrypted_otp_secret,
                     encoding: 'ascii',
                     token: req.body.otp_token
 
@@ -211,8 +215,9 @@ export const register = async (req, res) => {
         const email = sanitiseSQL(req.body.email)
         const password = sanitiseSQL(req.body.password)
 
-        const salt = await bcrypt.genSalt()
-        const hash = await bcrypt.hash(password, salt)
+        // hash password
+        const password_salt = await bcrypt.genSalt()
+        const password_hash = await bcrypt.hash(password, password_salt)
 
 
         // attempt to find the user by username / email...
@@ -248,19 +253,34 @@ export const register = async (req, res) => {
                 error: "The 2FA token could not be verifed for the secret. Please try again"
             })
         }
+
+        // encrypt OTP secret
+        const cryptr = new Cryptr(ENCRYPTION_KEY);
+        const otp_secret_encrypted = cryptr.encrypt(req.body.otp_secret_text);
+        const email_encrypted = cryptr.encrypt(req.body.email);
+
         // if username / email is not present, we can create a new user
-        const newUser = await CreateUser(desiredUsername, email, hash, req.body.otp_secret_text)
+        await CreateUser(desiredUsername, email_encrypted, password_hash, otp_secret_encrypted)
 
         // add the credentials to the req object 
         req.body.uname = desiredUsername
         req.body.password = password
         
-        // log the user in
+        // now find the new user and log them in
+        const newUser = await GetUserByUsername(desiredUsername)
+
+        // set the session to authenticated
+        req.session.authenticated = true;
+        req.session.csrfToken = CSRF_TOKEN
+        req.session.user = {id: newUser.id, username: desiredUsername, isAdmin: newUser.is_admin}
+
+        // redirect to homepage, now logged in
         await enum_timeout(req.startTime); // account enumeration timeout
-        return await login(req, res)
+        return res.redirect('/')
     
     }
     catch(err) {
+        console.log('ERROR DURING REGISTRATION\n' + err)
         await enum_timeout(req.startTime); // account enumeration timeout
         req.session.errorCode = 500; 
         return res.status(500).render('oops', {

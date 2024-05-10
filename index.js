@@ -6,13 +6,13 @@ import { dbConfig } from './config/db_config.js';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import { setTimeout } from 'timers/promises';
-
 import fs from 'fs'
 import https from 'https'
 import path from 'path'
 
 // Our CSRF code
-export const CSRF_TOKEN = "shhhh this is the CSRF code!"
+export const CSRF_TOKEN = "shhhh this is the secret CSRF code!"
+export const ENCRYPTION_KEY = "shhhh this is the secret encryption code!"
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -154,22 +154,35 @@ CREATE TABLE IF NOT EXISTS reviews
         ON DELETE NO ACTION
 )
 `
-// add admin user and default users query
+// add admin user and default users query. Email and OTP are encrypted, password is hashed
 // NOTE: All default user passwords are 'password'
+// NOTE: 2FA information for these test users can be found in default_users_encryption.html in the root directory
 let addDefaultUsers = `
 INSERT INTO users (email,username,password,is_admin,otp_secret) 
-    VALUES ('admin@movies.com','admin','$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By','true',
-    'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    VALUES (
+    '7410fb9dfc2a641a78772129e0de5b09de1ea9c78c7b5bdde85fb17f8f7f7e50000e9dd6e03fb500786a3e6f192c759c4545e4a1cf29ff2e551859de3c24c4d869fc8fe4123c7c1f6e44c31ec6054130797f9f328a87d684e3e5cd6d8f4efb779ff9e2fde4815ab4050555dcc7fbcea9',
+    'admin',
+    '$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By',
+    'true',
+    '33fabc2a46e464f60c34d462934ce61746b25b5fd9fe753ddfce46b504a17eff27298f4b8895f246a98210e9e9845c2f97856d54c8fe6ba4c14e74fcb1b65cff9515dd6d4d2e687cac53dece11ab0cc3ddd7211607d017c0735c037eb1b42e3ab3a325ab246412285320c02621180de16395d20ede7127f0244d444e06c05213'
     );
 
 INSERT INTO users (email,username,password,is_admin,otp_secret) 
-    VALUES ('tom@movies.com','Tom F.','$2b$10$oFDFM8oBs4k1BDnKfPBQ9.sl1f2ufnDzyv4aPEyiT77xiyUD6Wh4i','false',
-    'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    VALUES (
+    'a36fe67010aeb276b28548b3d05f705f489cf4516bed64a38d6127e150539f391d04a9da7a2a5824cedc2622314e08288a7265ff92cc8ebef1b8491d3b6ec700da81938dfdedca954ff806db2d0ef193ac99fa7456a2e5ab60bbd7736ec2689ed5a53e51a099cc8989634d822e3e',
+    'Tom F.',
+    '$2b$10$oFDFM8oBs4k1BDnKfPBQ9.sl1f2ufnDzyv4aPEyiT77xiyUD6Wh4i',
+    'false',
+    '65e6d1993d6ae05b387ccc2cb27b7ef39b5ba9fe02b772a977325ce128ab36b1b619b90be8bfbad89930212847b6eab4535099f3e7867db28c6a56aaaaacc2568f82f8fafb03f198159f68ff2dbd0f845864b8b819cfab5f23fec69af072cd3d8e2c56d9b073cb7ff32927d9aa752da2c4deb4d2489cdba2dd2064706fdbde72'
     );
 
 INSERT INTO users (email,username,password,is_admin,otp_secret) 
-    VALUES ('john@movies.com','John H.','$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO','false',
-        'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    VALUES (
+    '5920f85e927cfb741ac1856d7c675b953dcbcaee3ef383ae84fe079efe984566263717d933a085152910cc47a780b79c80abd696547b8d0a8ea48b898e76173315ffc5cecb53c6a485503fd5c5a5b2cdd1da1cad137ddd2f48d1729fd56ccd9f2e8551f55778d2262d3f1dd2ae952d',
+    'John H.',
+    '$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO',
+    'false',
+    '516d3f2638a6eaf88fc3315e21eb0e5afe9d878e2a9d2724dc17c87bbb755b201d5cc364ce415e17e1728b24694d0a22f7f8363d317d1c4bd37b966d73458010ac765a8112f2d91a3674193fa98bf47c7e7c492e9993e6dbc4bf2161a1c4df68e3e3c56791d7f8db5503b16b8b59eecb094e6a6deebf080f6230c93730633a59'
     );
 `
 
