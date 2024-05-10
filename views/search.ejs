@@ -5,13 +5,13 @@
     <div class="section">
         <h1>Results for <em><%= query %></em>:</h1>
         <% if(!results.length){ %>
-            <p>No Results found.</p>
+            <p class="no_results">No Results found.</p>
           <% } %> 
         <ul>
         <% results.forEach(function(result){ %>
-            <li>
+            <li class="result">
                 <a href="<%= result.url %>" class="">
-                        <strong><%- result.type %>:</strong> <%- result.name %>
+                        <strong><%- result.type %>:</strong> <span class="result_name"><%- result.name %></span>
                 </a>
             </li>
             <% }); %>

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import sanitiseSQL from '../scripts/sanitiseSQL.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
-import { enum_timeout } from '../index.js'
+import { CSRF_TOKEN, enum_timeout } from '../index.js'
 import stringFirewallTest from '../scripts/firewall.js'
 
 
@@ -14,7 +14,8 @@ export const showSigninPage = async (req, res) => {
 
     // else, render the page
     res.render('signin', {
-        session_username: req.session.user ? req.session.user.username : false,
+        session_username: req.session.user ? req.session.user.username : false, 
+        csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
         error: false
     })
 }
@@ -28,7 +29,8 @@ export const showSignupPage = async (req, res) => {
 
     // else, render the page
     res.render('signup', {
-        session_username: req.session.user ? req.session.user.username : false,
+        session_username: req.session.user ? req.session.user.username : false, 
+        csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
         error: false
     })
 }
@@ -41,7 +43,8 @@ export const login = async (req, res) => {
             req.session.errorCode = 403; 
 
             return res.status(403).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 403, msg: `Your login credentials violated our security policies.`
             })   
         }
@@ -57,7 +60,8 @@ export const login = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout 
             req.session.errorCode = 400; 
             return res.status(400).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 400, msg: "Bad Request"
             })
         }
@@ -83,6 +87,8 @@ export const login = async (req, res) => {
                 
                 // set the session to authenticated
                 req.session.authenticated = true;
+
+                req.session.csrfToken = CSRF_TOKEN
                 req.session.user = {id: user.id, username: username, isAdmin: user.is_admin}
 
                 // redirect to homepage, now logged in
@@ -102,7 +108,8 @@ export const login = async (req, res) => {
         } catch (error) {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(500).render('signin', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error: "Something went wrong!"
             })
         }
@@ -112,7 +119,8 @@ export const login = async (req, res) => {
         await enum_timeout(req.startTime); // account enumeration timeout
         req.session.errorCode = 500; 
         return res.status(500).render('oops', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Something went wrong."
         })
     } 
@@ -122,6 +130,15 @@ export const login = async (req, res) => {
 // logout a user
 export const logout = async (req, res) => {
 
+    if (req.body.csrfToken !== CSRF_TOKEN) {
+        await enum_timeout(req.startTime); // account enumeration timeout
+        return res.status(500).render('oops', {
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+            error_code: 500, msg: "Invalid CSRF"
+        })
+    }
+
     // destroy the session
     req.session.destroy(async (err) => {
         // if there is an error, render error page
@@ -129,7 +146,8 @@ export const logout = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             req.session.errorCode = 500; 
             return res.status(500).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 500, msg: `Something went wrong.`
             })   
         }
@@ -146,7 +164,8 @@ export const register = async (req, res) => {
         if (stringFirewallTest(req.body.uname) || stringFirewallTest(req.body.email) || stringFirewallTest(req.body.password)) {
             req.session.errorCode = 403; 
             return res.status(403).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 403, msg: `Your signup credentials violated our security policies, please try again.`
             })   
         }
@@ -167,7 +186,8 @@ export const register = async (req, res) => {
         if (userByUsername || userByEmail) {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('signup', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error: "That username / email already exists! Please log in."
             })
         }

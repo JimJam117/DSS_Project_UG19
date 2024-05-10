@@ -8,7 +8,8 @@ export default function sanitiseSQL(input) {
         'MAX', 'CONCAT', 'SUBSTRING', 'CAST', 'CASE'];
 
         for (const string of stringsToCheck) {
-            const searchIndex = sanitisedInput.toUpperCase().indexOf(string);
+            const sanitisedInputCased = sanitisedInput.toUpperCase(); // convert input to upper case
+            const searchIndex = sanitisedInputCased.indexOf(string); // check upper case input for the current string
 
             //will return -1 if the checked string is not an index of the input
             if (searchIndex !== -1) {

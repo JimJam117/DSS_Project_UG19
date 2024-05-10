@@ -11,7 +11,8 @@ import fs from 'fs'
 import https from 'https'
 import path from 'path'
 
-
+// Our CSRF code
+export const CSRF_TOKEN = "shhhh this is the CSRF code!"
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -247,6 +248,7 @@ import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
 import reportRoutes from './routes/report.js'
+import { runSeleniumTests } from './test/Tests.js';
 
 // routes setup
 app.use('/', genericRoutes);
@@ -256,3 +258,5 @@ app.use('/movie', movieRoutes);
 app.use('/review', reviewRoutes);
 
 app.use('/report', reportRoutes);
+
+// /runSeleniumTests();

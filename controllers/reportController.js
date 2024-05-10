@@ -5,9 +5,9 @@ import sanitiseSQL from '../scripts/sanitiseSQL.js';
 // get page route
 export const getPage = async (req, res) => {
     try {
-        //postReport(req);
         return res.render('report', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             reportSubmitted: false
         })
     }
