@@ -21,6 +21,7 @@ export const getAllReviews = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Could not get reviews"
@@ -35,6 +36,7 @@ export const getReview = async (req, res) => {
         const review = await GetReview(req.params.id);
 
         if (stringFirewallTest(review.title) || stringFirewallTest(review.body) || stringFirewallTest(user.username)) {
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 403, msg: `This review violates are security policies.`
@@ -72,7 +74,7 @@ export const getReview = async (req, res) => {
             })
     }
     catch(err) {
-        console.log(err)
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Could not get review"
@@ -91,6 +93,7 @@ export const showCreateReviewForm = async (req, res) => {
 
             // check user id is valid
             if (user === undefined) {
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
@@ -100,6 +103,7 @@ export const showCreateReviewForm = async (req, res) => {
 
         // if the user is not authenticated
         else {
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: Cannot display page as there is no valid session.`
@@ -116,6 +120,7 @@ export const showCreateReviewForm = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Could not load review form"
@@ -129,6 +134,7 @@ export const createReview = async (req, res) => {
 
         // Test the body and title for possible firewall violations (this is the first line of defence)
         if (stringFirewallTest(req.body.body) || stringFirewallTest(req.body.title)) {
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 403, msg: `Your review violated our security policies`
@@ -151,6 +157,7 @@ export const createReview = async (req, res) => {
             // check user id is valid
             if (user === undefined) {
                 await enum_timeout(req.startTime); // account enumeration timeout
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
@@ -161,6 +168,7 @@ export const createReview = async (req, res) => {
         // if the user is not authenticated
         else {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: No valid session.`
@@ -227,6 +235,7 @@ export const createReview = async (req, res) => {
     catch(err) {
         console.log("Error creating review:", err)
         await enum_timeout(req.startTime); // account enumeration timeout
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: `Error occured when creating review.`
@@ -248,6 +257,7 @@ export const deleteReview = async (req, res) => {
             // check user id is valid
             if (user === undefined) {
                 await enum_timeout(req.startTime); // account enumeration timeout
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
@@ -258,6 +268,7 @@ export const deleteReview = async (req, res) => {
         // if the user is not authenticated
         else {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: No valid session.`
@@ -269,6 +280,7 @@ export const deleteReview = async (req, res) => {
 
         if (review === undefined) {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 400; 
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 400, msg: `Bad Request: Specified review id does not exist.`
@@ -280,6 +292,7 @@ export const deleteReview = async (req, res) => {
 
         if (review.user_id != user.id) {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 401, msg: `Unauthorised: You cannot delete reviews from other users.`
@@ -297,6 +310,7 @@ export const deleteReview = async (req, res) => {
     catch(err) {
         console.log("Error deleting review:", err)
         await enum_timeout(req.startTime); // account enumeration timeout
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: `Error occured when deleting review.`

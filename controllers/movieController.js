@@ -16,6 +16,7 @@ export const getAllMovies = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Could not get movies"
@@ -75,6 +76,7 @@ export const getMovie = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Could not get movie"

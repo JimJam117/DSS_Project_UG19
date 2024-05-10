@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+
+    <!-- Reports Section -->
+    <div class="section">
+        <h1>Reports:</h1>
+ 
+        <% reports.forEach(function(report){ %>
+                <div class="list_item_details">
+                    <h2><%= report.timestamp %></h2>
+                    <p><strong>Message:</strong> <%= report.details %></p>
+                    <p><strong>Error Code:</strong> <%= report.error_code %></p>
+                    <p><strong>Browser:</strong> <%= report.browser %></p>
+                </div>
+                <hr>
+                
+            <% }); %>
+ 
+    </div>
+
+   
+
+<%- include('partials/footer') %>
