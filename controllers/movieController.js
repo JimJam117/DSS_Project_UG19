@@ -11,7 +11,8 @@ export const getAllMovies = async (req, res) => {
         const movies = await GetAllMovies();
 
         return res.render('movies', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             movies: movies
         })
     }
@@ -19,6 +20,7 @@ export const getAllMovies = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not get movies"
         })
     } 
@@ -65,7 +67,8 @@ export const getMovie = async (req, res) => {
 
         // return a render of the view with the detials as params
         return res.render('movie', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             title: movie.title,
             director: movie.director,
             movie_cast: movie.movie_cast,
@@ -79,6 +82,7 @@ export const getMovie = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not get movie"
         })
     } 

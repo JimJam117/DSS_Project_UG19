@@ -3,7 +3,7 @@ import {GetAllMovies, GetMovie} from '../models/Movie.js'
 import {GetUser} from '../models/User.js'
 import { calcStars } from '../scripts/rating.js';
 import sanitiseSQL from '../scripts/sanitiseSQL.js';
-import { enum_timeout } from '../index.js';
+import { CSRF_TOKEN, enum_timeout } from '../index.js';
 import htmlEncode from '../scripts/htmlEncode.js';
 import stringFirewallTest from '../scripts/firewall.js';
 
@@ -16,7 +16,8 @@ export const getAllReviews = async (req, res) => {
         const checkedReviews = reviews.filter(review => !stringFirewallTest(review.title) && !stringFirewallTest(review.body));
 
         return res.render('reviews', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             reviews: checkedReviews,
         })
     }
@@ -24,6 +25,7 @@ export const getAllReviews = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not get reviews"
         })
     } 
@@ -35,10 +37,11 @@ export const getReview = async (req, res) => {
         // check firewall first
         const review = await GetReview(req.params.id);
 
-        if (stringFirewallTest(review.title) || stringFirewallTest(review.body) || stringFirewallTest(user.username)) {
+        if (stringFirewallTest(review.title) || stringFirewallTest(review.body)) {
             req.session.errorCode = 403; 
             return res.status(403).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 403, msg: `This review violates are security policies.`
             })   
         }
@@ -61,7 +64,8 @@ export const getReview = async (req, res) => {
         }
 
         return res.render('review', { 
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 movie_title: movie.title,
                 review_title: htmlEncode(review.title),
                 review_id: review.id,
@@ -77,6 +81,7 @@ export const getReview = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not get review"
         })
     } 
@@ -96,6 +101,7 @@ export const showCreateReviewForm = async (req, res) => {
                 req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
+                    csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
                 })   
             }
@@ -105,7 +111,8 @@ export const showCreateReviewForm = async (req, res) => {
         else {
             req.session.errorCode = 401; 
             return res.status(401).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 401, msg: `Unauthorised: Cannot display page as there is no valid session.`
             }) 
         }
@@ -113,7 +120,8 @@ export const showCreateReviewForm = async (req, res) => {
         // get all movies
         const movies = await GetAllMovies();
         return res.render('createReview', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             movies: movies,
             selectedMovieId: req.body.movieId ? req.body.movieId : false,
             error: false
@@ -123,6 +131,7 @@ export const showCreateReviewForm = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not load review form"
         })
     } 
@@ -137,8 +146,18 @@ export const createReview = async (req, res) => {
             req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 403, msg: `Your review violated our security policies`
             })   
+        }
+
+        if (req.body.csrfToken !== CSRF_TOKEN) {
+            await enum_timeout(req.startTime); // account enumeration timeout
+            return res.status(500).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                error_code: 500, msg: "Invalid CSRF"
+            })
         }
 
         // Get details from req object. Sanatise all for safety
@@ -160,6 +179,7 @@ export const createReview = async (req, res) => {
                 req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
+                    csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
                 })   
             }
@@ -170,7 +190,8 @@ export const createReview = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             req.session.errorCode = 401; 
             return res.status(401).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 401, msg: `Unauthorised: No valid session.`
             }) 
         }
@@ -184,6 +205,7 @@ export const createReview = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(400).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 movies,
                 error: `Bad Request: Specified movie id does not exist.`
             })   
@@ -196,6 +218,7 @@ export const createReview = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 movies,
                 error: `Your account ${user.username} has already made a review for this movie ${movie.title}.`
             })
@@ -206,6 +229,7 @@ export const createReview = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 movies,
                 error: `The title is empty.`
             })
@@ -214,7 +238,8 @@ export const createReview = async (req, res) => {
         if (body === undefined || body.length < 1) {
             await enum_timeout(req.startTime); // account enumeration timeout
             return res.status(403).render('createReview', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 movies,
                 error: `The body is empty.`
             })
@@ -237,7 +262,8 @@ export const createReview = async (req, res) => {
         await enum_timeout(req.startTime); // account enumeration timeout
         req.session.errorCode = 500; 
         return res.status(500).render('oops', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: `Error occured when creating review.`
         })
     } 
@@ -252,6 +278,15 @@ export const deleteReview = async (req, res) => {
         // first, check there is a session and the user id is valid
         if (req.session && req.session.authenticated) {
 
+            if (req.body.csrfToken !== CSRF_TOKEN) {
+                await enum_timeout(req.startTime); // account enumeration timeout
+                return res.status(500).render('oops', {
+                    session_username: req.session.user ? req.session.user.username : false, 
+                    csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                    error_code: 500, msg: "Invalid CSRF"
+                })
+            }
+
             const user = await GetUser(req.session.user.id)
 
             // check user id is valid
@@ -260,6 +295,7 @@ export const deleteReview = async (req, res) => {
                 req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
+                    csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                     error_code: 400, msg: `Bad Request: Current user session is not valid.`
                 })   
             }
@@ -271,6 +307,7 @@ export const deleteReview = async (req, res) => {
             req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 401, msg: `Unauthorised: No valid session.`
             }) 
         }
@@ -283,6 +320,7 @@ export const deleteReview = async (req, res) => {
             req.session.errorCode = 400; 
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 400, msg: `Bad Request: Specified review id does not exist.`
             })   
         }
@@ -294,7 +332,8 @@ export const deleteReview = async (req, res) => {
             await enum_timeout(req.startTime); // account enumeration timeout
             req.session.errorCode = 401; 
             return res.status(401).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 401, msg: `Unauthorised: You cannot delete reviews from other users.`
             }) 
         }
@@ -313,6 +352,7 @@ export const deleteReview = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: `Error occured when deleting review.`
         })
     } 
