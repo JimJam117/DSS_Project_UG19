@@ -37,6 +37,7 @@ export const getUser = async (req, res) => {
 
         if (violation) {
             // If user data is not secure, render an error page
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',

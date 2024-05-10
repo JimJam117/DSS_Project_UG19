@@ -23,6 +23,7 @@ export const getIndex = async (req, res) => {
         })
     }
     catch (err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', { error_code: 500, msg: "Generic Error" })
     }
 }
@@ -33,15 +34,15 @@ export const postSearch = async (req, res) => {
         // results array
         let results = []
 
-        if (stringFirewallTest(req.body.query) == false) {
-            console.log("firewall passed")
-        }
-        else {
+        if (stringFirewallTest(req.body.query) == true) {
             console.log("firewall violation!")
-            return res.status(500).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false, 
+
+            req.session.errorCode = 403; 
+
+            return res.status(403).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false,
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-                error_code: 500, msg: "Generic Error"
+                error_code: 403, msg: "Invalid Search value(s)"
             })
         }
 
@@ -97,7 +98,7 @@ export const postSearch = async (req, res) => {
 
     // catch errors
     catch (err) {
-        console.log(err)
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false, 
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',

@@ -22,10 +22,11 @@ export const getAllReviews = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
-            session_username: req.session.user ? req.session.user.username : false, 
+            session_username: req.session.user ? req.session.user.username : false,
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not get reviews"
         })
     } 
 }
@@ -37,6 +38,7 @@ export const getReview = async (req, res) => {
         const review = await GetReview(req.params.id);
 
         if (stringFirewallTest(review.title) || stringFirewallTest(review.body)) {
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -76,11 +78,11 @@ export const getReview = async (req, res) => {
             })
     }
     catch(err) {
-        console.log(err)
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not get review"
         })
     } 
 }
@@ -96,6 +98,7 @@ export const showCreateReviewForm = async (req, res) => {
 
             // check user id is valid
             if (user === undefined) {
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -106,6 +109,7 @@ export const showCreateReviewForm = async (req, res) => {
 
         // if the user is not authenticated
         else {
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -124,10 +128,11 @@ export const showCreateReviewForm = async (req, res) => {
         })
     }
     catch(err) {
+        req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-            error_code: 500, msg: "Generic Error"
+            error_code: 500, msg: "Could not load review form"
         })
     } 
 }
@@ -138,6 +143,7 @@ export const createReview = async (req, res) => {
 
         // Test the body and title for possible firewall violations (this is the first line of defence)
         if (stringFirewallTest(req.body.body) || stringFirewallTest(req.body.title)) {
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -170,6 +176,7 @@ export const createReview = async (req, res) => {
             // check user id is valid
             if (user === undefined) {
                 await enum_timeout(req.startTime); // account enumeration timeout
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -181,6 +188,7 @@ export const createReview = async (req, res) => {
         // if the user is not authenticated
         else {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -252,6 +260,7 @@ export const createReview = async (req, res) => {
     catch(err) {
         console.log("Error creating review:", err)
         await enum_timeout(req.startTime); // account enumeration timeout
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false, 
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -283,6 +292,7 @@ export const deleteReview = async (req, res) => {
             // check user id is valid
             if (user === undefined) {
                 await enum_timeout(req.startTime); // account enumeration timeout
+                req.session.errorCode = 400; 
                 return res.status(400).render('oops', {
                     session_username: req.session.user ? req.session.user.username : false,
                     csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -294,6 +304,7 @@ export const deleteReview = async (req, res) => {
         // if the user is not authenticated
         else {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -306,6 +317,7 @@ export const deleteReview = async (req, res) => {
 
         if (review === undefined) {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 400; 
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -318,6 +330,7 @@ export const deleteReview = async (req, res) => {
 
         if (review.user_id != user.id) {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 401; 
             return res.status(401).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
@@ -336,6 +349,7 @@ export const deleteReview = async (req, res) => {
     catch(err) {
         console.log("Error deleting review:", err)
         await enum_timeout(req.startTime); // account enumeration timeout
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             csrf_token: req.session.csrfToken ? req.session.csrfToken : '',

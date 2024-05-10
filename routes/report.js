@@ -1,11 +1,12 @@
 import Router from 'express';
 //import { getIndex, postSearch } from '../controllers/genericController.js';
-import { getPage, postReport } from "../controllers/reportController.js"
+import { getAllReports, getPage, postReport } from "../controllers/reportController.js"
 
 const router = Router();
 
+router.get('/all', getAllReports);
 router.get('/', getPage);
-router.post('/post-report', postReport);
+router.post('/', postReport);
 
 
 export default router;

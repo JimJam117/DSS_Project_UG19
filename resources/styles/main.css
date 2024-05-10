@@ -148,3 +148,11 @@ body {
     color: aqua;
     text-decoration: none;
 }
+
+.report_textarea {
+    width: 544px; 
+    height: 134px;
+}
+
+.row {
+}
