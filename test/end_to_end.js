@@ -335,5 +335,3 @@ export const runSeleniumTests = async () => {
         return [true, ""]
     })    
 }
-
-runSeleniumTests()

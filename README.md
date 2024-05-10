@@ -57,14 +57,48 @@ choco install mkcert
 mkcert -install
 ```
 
+Please refer to the README in the `certificate` folder for more information. 
 
+**NOTE:** You may need to add your generated certificate to your browsers list of accepted certificates. [For Firefox refer to this tutorial](https://docs.titanhq.com/en/3834-importing-ssl-certificate-in-mozilla-firefox.html), similar tutorials are easy to find for Chrome.
 
+After project has started, navigate to: [https://localhost:5000/](https://localhost:5000/)
 
+<br><hr><br>
 
-After project has started, navigate to:
-### [http://localhost:5000/](http://localhost:5000/)
+## Testing Setup
+Both **Unit Testing** with Mocha and **End-to-End Testing** with Selenium ([documentation here](https://www.selenium.dev/documentation/webdriver/getting_started/first_script/)) are implemented. 
 
-<br>
+To run the unit tests, use the `test` script:
+```
+npm run test
+```
+
+Test results should appear in the console window.
+
+## End to End Testing
+
+To run the Selenium tests, use the `end_to_end` script:
+```
+npm run end_to_end
+```
+
+Selenium requires a web driver to function. The default driver for this project is Firefox, however you can change it by modifying `webdriver_browser` in the file `config/webdriver_config.js`:
+```javascript
+import {Builder, Browser} from 'selenium-webdriver';
+
+export const webdriver_browser = Browser.FIREFOX; // or CHROME, EDGE etc.
+
+export const build_webdriver = async () => {
+    let driver = await new Builder().withCapabilities({"acceptInsecureCerts": true}).forBrowser(webdriver_browser).build();
+    return driver
+}
+``` 
+
+Usually, having a web browser installed will be enough to utilise the driver. However, you may need to manually download a web driver and have it accessable in your $PATH for Selenium to work properly. Drivers are available here:
+- Gecko (Firefox) Driver: https://github.com/mozilla/geckodriver/releases
+- Chrome Driver: https://chromedriver.chromium.org/downloads
+
+<br><hr><br>
 
 ## Project Layout
 The project follows an **MVC** (Model-View-Controller) design pattern:
