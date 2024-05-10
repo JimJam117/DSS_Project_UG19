@@ -270,10 +270,9 @@ import reviewRoutes from './routes/review.js'
 import reportRoutes from './routes/report.js'
 
 // routes setup
-app.use('/', genericRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/movie', movieRoutes);
 app.use('/review', reviewRoutes);
-
 app.use('/report', reportRoutes);
+app.use('/', genericRoutes);
