@@ -11,7 +11,8 @@ import fs from 'fs'
 import https from 'https'
 import path from 'path'
 
-
+// Our CSRF code
+export const CSRF_TOKEN = "shhhh this is the CSRF code!"
 
 // Get current directory
 const current_dir = dirname(fileURLToPath(import.meta.url));

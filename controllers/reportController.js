@@ -6,7 +6,8 @@ export const getPage = async (req, res) => {
         postReport(req);
         //console.log("sdashs")
         return res.render('report', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
         })
     } 
     catch (err) {

@@ -4,7 +4,7 @@
     <h2>Create New Review:</h2>
 
     <form action="/review/create" method="post" content-type="json">
-
+        <input hidden id="csrf" name="csrfToken" value="<%= csrf_token %>">
         <label for="movie_id">Review for Movie:</label><br>
         <select id="movie_id" name="movie_id">
         <% movies.forEach(function(movie){%>

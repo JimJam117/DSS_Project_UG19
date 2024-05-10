@@ -16,7 +16,8 @@ export const getAllUsers = async (req, res) => {
         });
 
         return res.render('users', {
-            session_username: req.session.user ? req.session.user.username : false,
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             users: checkedUsers
         })
     }
@@ -37,7 +38,8 @@ export const getUser = async (req, res) => {
         if (violation) {
             // If user data is not secure, render an error page
             return res.status(403).render('oops', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 403, msg: `This username violated our security policies`
             })  
         }
@@ -55,7 +57,8 @@ export const getUser = async (req, res) => {
         }
         
         return res.render('user', {
-                session_username: req.session.user ? req.session.user.username : false,
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 user_reviews: reviewsWithMovieTitles,
                 user_username: user.username,
             })
