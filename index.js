@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS users
     id serial NOT NULL,
     email character varying COLLATE pg_catalog."default" NOT NULL,
     username character varying COLLATE pg_catalog."default" NOT NULL,
+    otp_secret character varying COLLATE pg_catalog."default",
     password character varying COLLATE pg_catalog."default",
     is_admin boolean NOT NULL DEFAULT false,
     CONSTRAINT users_pkey PRIMARY KEY (id),
@@ -156,14 +157,20 @@ CREATE TABLE IF NOT EXISTS reviews
 // add admin user and default users query
 // NOTE: All default user passwords are 'password'
 let addDefaultUsers = `
-INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('admin@movies.com','admin','$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By','true');
+INSERT INTO users (email,username,password,is_admin,otp_secret) 
+    VALUES ('admin@movies.com','admin','$2b$10$ARzxy5533qLRDpjKVToWJOtu.ZBZjKb72ADFMIGZImm8vxQWeK7By','true',
+    'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    );
 
-INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('tom@movies.com','Tom F.','$2b$10$oFDFM8oBs4k1BDnKfPBQ9.sl1f2ufnDzyv4aPEyiT77xiyUD6Wh4i','false');
+INSERT INTO users (email,username,password,is_admin,otp_secret) 
+    VALUES ('tom@movies.com','Tom F.','$2b$10$oFDFM8oBs4k1BDnKfPBQ9.sl1f2ufnDzyv4aPEyiT77xiyUD6Wh4i','false',
+    'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    );
 
-INSERT INTO users (email,username,password,is_admin) 
-    VALUES ('john@movies.com','John H.','$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO','false');
+INSERT INTO users (email,username,password,is_admin,otp_secret) 
+    VALUES ('john@movies.com','John H.','$2b$10$A9moKFRhwF9coeGm8RtQpO6bfGuPnvgPf3Di2yUQh0oU0pyN7l/kO','false',
+        'x]V3}zOq,[7w6W5qosu>]6XM,9618I/['
+    );
 `
 
 // add movie records to DB query

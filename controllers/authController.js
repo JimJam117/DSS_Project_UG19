@@ -3,7 +3,8 @@ import sanitiseSQL from '../scripts/sanitiseSQL.js'
 import { GetUserByUsername,GetUserByEmail, CreateUser } from '../models/User.js'
 import { CSRF_TOKEN, enum_timeout } from '../index.js'
 import stringFirewallTest from '../scripts/firewall.js'
-
+import speakeasy from 'speakeasy'
+import { toDataURL } from 'qrcode'
 
 export const showSigninPage = async (req, res) => {
 
@@ -27,11 +28,31 @@ export const showSignupPage = async (req, res) => {
         return res.redirect('/');
     }
 
-    // else, render the page
-    res.render('signup', {
-        session_username: req.session.user ? req.session.user.username : false, 
-        csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
-        error: false
+    // generate a otp secret
+    const otp_secret = speakeasy.generateSecret({
+        name: 'Movie Blog (DSS UG_19)'
+    })
+
+    // generate a qr code for the otp secret
+    toDataURL(otp_secret.otpauth_url, (err, data) => {
+        // if there is an error generating QR code
+        if (err || data === '') {
+            req.session.errorCode = 500; 
+            return res.status(500).render('oops', {
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                error_code: 500, msg: "Error Generating QR code."
+            })
+        }
+      
+
+        res.render('signup', {
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+            otp_secret_text: otp_secret.ascii,
+            qrcode_data_string: data,
+            error: false
+        })
     })
 }
 
@@ -84,7 +105,23 @@ export const login = async (req, res) => {
 
             // if the password matches the inputted password
             if (match) {
-                
+
+                // verify the OTP is correct
+                const otp_is_verifed = speakeasy.totp.verify({
+                    secret: user.otp_secret,
+                    encoding: 'ascii',
+                    token: req.body.otp_token
+
+                })
+
+                if (!otp_is_verifed) {
+                    return res.status(403).render('signin', {
+                        session_username: req.session.user ? req.session.user.username : false, 
+                        csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                        error: "The 2FA token could not be verifed for the secret. Please try again"
+                    })
+                }
+                        
                 // set the session to authenticated
                 req.session.authenticated = true;
 
@@ -188,12 +225,31 @@ export const register = async (req, res) => {
             return res.status(403).render('signup', {
                 session_username: req.session.user ? req.session.user.username : false, 
                 csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                otp_secret_text: otp_secret_text,
+                qrcode_data_string: qrcode_data_string,
                 error: "That username / email already exists! Please log in."
             })
         }
 
+        // verify the OTP is correct
+        const otp_is_verifed = speakeasy.totp.verify({
+            secret: req.body.otp_secret_text,
+            encoding: 'ascii',
+            token: req.body.otp_token
+
+        })
+
+        if (!otp_is_verifed) {
+            return res.status(403).render('signup', {
+                session_username: req.session.user ? req.session.user.username : false, 
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+                otp_secret_text: req.body.otp_secret_text,
+                qrcode_data_string: req.body.qrcode_data_string ,
+                error: "The 2FA token could not be verifed for the secret. Please try again"
+            })
+        }
         // if username / email is not present, we can create a new user
-        const newUser = await CreateUser(desiredUsername, email, hash)
+        const newUser = await CreateUser(desiredUsername, email, hash, req.body.otp_secret_text)
 
         // add the credentials to the req object 
         req.body.uname = desiredUsername
@@ -206,6 +262,11 @@ export const register = async (req, res) => {
     }
     catch(err) {
         await enum_timeout(req.startTime); // account enumeration timeout
-        return res.status(500).json(err);
+        req.session.errorCode = 500; 
+        return res.status(500).render('oops', {
+            session_username: req.session.user ? req.session.user.username : false, 
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
+            error_code: 500, msg: "Something went wrong when registering."
+        })
     } 
 }

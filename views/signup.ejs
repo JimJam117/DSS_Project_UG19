@@ -13,7 +13,34 @@
 
         <label hidden for="password">Password:</label><br>
         <input type="password" id="password" name="password" placeholder="Password"><br><br>
-        
+
+        <hr>
+        <div class="otp-guide">
+        <h2>Two Factor Authentication:</h2>
+        <p>As an extra security measure, we require our users to have two factor authentication.</p>
+        <h3>Setup is simple:</h3>
+        <ul>
+            <li>First, download a two factor app on your mobile device, such as Google Authenticator (available on the 
+                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en_GB&gl=US&pli=1">Android Play Store</a>
+                and 
+                <a href="https://apps.apple.com/us/app/google-authenticator/id388497605">Apple App Store</a>)
+            </li>
+            <li>Next, scan the QR code below (or enter your OTP secret into the app manually)</li>
+            <li>Finally, enter your generated code into the box below to verify the code is working</li>
+        </ul>
+    </div>
+    <br>
+        <hr>
+        <p>OTP Secret: <%= otp_secret_text %></p>
+        <input type="hidden" id="otp-secret-text" name="otp_secret_text" value="<%= otp_secret_text %>">
+        <input type="hidden" id="otp-qr-code-data" name="qrcode_data_string" value="<%- qrcode_data_string %>">
+        <img src="<%- qrcode_data_string %>" alt="One Time Password Setup QR Code">
+        <br>
+        <label hidden for="otp-pass">Verify Code:</label><br>
+        <input type="text" id="otp-pass-input" name="otp_token" placeholder="Enter the code on your device">
+
+        <br><br><hr><br>
+
         <% if(error) { %>
             <p class="error"><%= error %></p>
         <% } %>

@@ -83,12 +83,11 @@ export const GetUserByEmail = async (email) => {
 }
 
 
-export const CreateUser = async (username, email, password) => {
+export const CreateUser = async (username, email, password, otp_secret) => {
     try { 
-
         // sql query:
-        const query = `INSERT INTO users (email,username,password,is_admin) 
-            VALUES ('${email}','${username}','${password}','false');`
+        const query = `INSERT INTO users (email,username,password,is_admin,otp_secret) 
+            VALUES ('${email}','${username}','${password}','false', '${otp_secret}');`
 
         const client = new pg.Client(dbConfig)
         await client.connect()
