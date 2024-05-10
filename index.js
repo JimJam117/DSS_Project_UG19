@@ -99,6 +99,7 @@ let dropTables = `
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS reports;
 `
 
 // create users table query
@@ -206,6 +207,20 @@ INSERT INTO reviews (rating,title,body,user_id,movie_id)
         fugiat aspernatur!','3','1');
 `
 
+
+// create reports table query
+let reportsCreateTable = `
+CREATE TABLE IF NOT EXISTS reports
+(
+    id serial NOT NULL,
+    error_code integer NOT NULL,
+    details character varying COLLATE pg_catalog."default",
+    browser character varying COLLATE pg_catalog."default",
+    timestamp character varying COLLATE pg_catalog."default"
+)
+`
+
+
 // Run queries to init database
 await client.query(dropTables)
 
@@ -217,6 +232,8 @@ await client.query(addDefaultMovies)
 
 await client.query(reviewsCreateTable)
 await client.query(addDefaultReviews)
+
+await client.query(reportsCreateTable)
 
 await client.end()
 

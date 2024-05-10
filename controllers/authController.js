@@ -37,6 +37,9 @@ export const showSignupPage = async (req, res) => {
 export const login = async (req, res) => {
     try { 
         if (stringFirewallTest(req.body.uname) || stringFirewallTest(req.body.password)) {
+
+            req.session.errorCode = 403; 
+
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 403, msg: `Your login credentials violated our security policies.`
@@ -52,6 +55,7 @@ export const login = async (req, res) => {
         // if session is already authenticated, then cannot login!
         if(req.session.authenticated) {  
             await enum_timeout(req.startTime); // account enumeration timeout 
+            req.session.errorCode = 400; 
             return res.status(400).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 400, msg: "Bad Request"
@@ -79,7 +83,7 @@ export const login = async (req, res) => {
                 
                 // set the session to authenticated
                 req.session.authenticated = true;
-                req.session.user = {id: user.id, username: username}
+                req.session.user = {id: user.id, username: username, isAdmin: user.is_admin}
 
                 // redirect to homepage, now logged in
                 await enum_timeout(req.startTime); // account enumeration timeout
@@ -106,6 +110,7 @@ export const login = async (req, res) => {
     }
     catch(err) {
         await enum_timeout(req.startTime); // account enumeration timeout
+        req.session.errorCode = 500; 
         return res.status(500).render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
             error_code: 500, msg: "Something went wrong."
@@ -122,6 +127,7 @@ export const logout = async (req, res) => {
         // if there is an error, render error page
         if (err) {
             await enum_timeout(req.startTime); // account enumeration timeout
+            req.session.errorCode = 500; 
             return res.status(500).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 500, msg: `Something went wrong.`
@@ -138,6 +144,7 @@ export const logout = async (req, res) => {
 export const register = async (req, res) => {
     try { 
         if (stringFirewallTest(req.body.uname) || stringFirewallTest(req.body.email) || stringFirewallTest(req.body.password)) {
+            req.session.errorCode = 403; 
             return res.status(403).render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
                 error_code: 403, msg: `Your signup credentials violated our security policies, please try again.`
