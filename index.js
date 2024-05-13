@@ -74,6 +74,38 @@ const setFrameOptions = (req, res, next) => {
 
 app.use(setFrameOptions);
 
+//DDOS protection code:
+const requestCounts = {};
+const MAX_REQUESTS_PER_IP = 20;
+const RESET_TIME = 5000; // 5 seconds 
+
+const DDoSMiddleware = (req, res, next) => {
+    const IP = req.ip || req.connection.remoteAddress;
+    
+    // if an object exists for that IP, carry on, otherwise create a new object for the IP
+    requestCounts[IP] = requestCounts[IP] || { count: 0, lastRequest: Date.now() };
+
+    // if time since last request has elapsed and reset the count
+    const timeSinceLastRequest = Date.now() - requestCounts[IP].lastRequest;
+    if (timeSinceLastRequest > RESET_TIME) {
+        requestCounts[IP] = { count: 0, lastRequest: Date.now() };
+    }
+
+    // if request count limit is exceeded
+    if (requestCounts[IP].count > MAX_REQUESTS_PER_IP) {
+        console.log('Rate limit exceeded for IP ', IP);
+        return res.status(429).json({ message: 'Too many requests. Please wait and try again.' });
+    }
+
+    // update lastRequest time and increment count
+    requestCounts[IP].lastRequest = Date.now();
+    requestCounts[IP].count++;
+
+    next();
+};
+
+app.use(DDoSMiddleware);
+
 // ejs as view engine
 app.set('view engine', 'ejs')
 
@@ -230,6 +262,7 @@ import movieRoutes from './routes/movie.js'
 import reviewRoutes from './routes/review.js'
 
 import reportRoutes from './routes/report.js'
+import { Interface } from 'readline';
 
 // routes setup
 app.use('/', genericRoutes);
