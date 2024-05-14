@@ -24,6 +24,7 @@ export const postReport = async (req, res) => {
 
         return res.render('report', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             reportSubmitted: true
         })
     }
@@ -43,6 +44,7 @@ export const getAllReports = async (req, res) => {
 
             return res.render('admin-reports', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 reports: reports
             })
         }
@@ -51,6 +53,7 @@ export const getAllReports = async (req, res) => {
             req.session.errorCode = 401; 
             return res.status('401').render('oops', {
                 session_username: req.session.user ? req.session.user.username : false,
+                csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
                 error_code: 401, msg: "Could not get reports, you are not the admin!"
             })
         }
@@ -59,6 +62,7 @@ export const getAllReports = async (req, res) => {
         req.session.errorCode = 500; 
         return res.status('500').render('oops', {
             session_username: req.session.user ? req.session.user.username : false,
+            csrf_token: req.session.csrfToken ? req.session.csrfToken : '',
             error_code: 500, msg: "Could not get reports"
         })
     } 
